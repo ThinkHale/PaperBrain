@@ -162,7 +162,9 @@ function confirm(msg) {
 }
 
 function renderMarkdown(text) {
-  return typeof marked !== "undefined" ? marked.parse(text ?? "") : `<pre>${escHtml(text)}</pre>`;
+  if (typeof marked === "undefined") return `<pre>${escHtml(text)}</pre>`;
+  const html = marked.parse(text ?? "");
+  return typeof DOMPurify !== "undefined" ? DOMPurify.sanitize(html) : `<pre>${escHtml(text)}</pre>`;
 }
 
 // ── Auth ──────────────────────────────────────────────────────
@@ -170,6 +172,19 @@ function renderMarkdown(text) {
 function showAuth() {
   authScreen.classList.remove("hidden");
   app.classList.add("hidden");
+}
+
+function showConfigError() {
+  authScreen.classList.remove("hidden");
+  app.classList.add("hidden");
+  authForm?.classList.add("hidden");
+  document.querySelector(".auth-tabs")?.classList.add("hidden");
+  document.querySelector(".auth-hint")?.classList.add("hidden");
+  if (authError) {
+    authError.style.color = "var(--danger)";
+    authError.textContent = Auth.configError;
+    authError.classList.remove("hidden");
+  }
 }
 
 function showApp() {
@@ -258,7 +273,7 @@ async function openProfileModal() {
   try {
     const profile = await DB.getProfile();
     profileNameInput.value = profile.display_name ?? "";
-    modelSelect.value = profile.model ?? "claude-sonnet-4-20250514";
+    modelSelect.value = profile.model ?? "gpt-5.4-mini";
   } catch (_) {}
 }
 
@@ -569,7 +584,7 @@ reprocessBtn?.addEventListener("click", async () => {
   reprocessBtn.disabled = true; reprocessBtn.textContent = "Processing…";
   try {
     const dataUrls = await Promise.all(state.currentImageUrls.map(fetchAsDataUrl));
-    const result = await API.processNote(dataUrls);
+    const result = await API.processNote(dataUrls, { noteId: state.currentNote.id });
     if (result?.ok && result.note) {
       state.currentNote = result.note;
       renderNoteModal(result.note);
@@ -882,6 +897,11 @@ async function init() {
   const dark = (localStorage.getItem("pb_theme") ?? "dark") === "dark";
   document.body.className = dark ? "theme-dark" : "theme-light";
   if (themeToggle) themeToggle.checked = dark;
+
+  if (!Auth.isConfigured) {
+    showConfigError();
+    return;
+  }
 
   // Initial view state
   viewNotes.style.display = "flex";

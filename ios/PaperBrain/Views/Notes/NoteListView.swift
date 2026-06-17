@@ -52,7 +52,7 @@ struct NoteListView: View {
         }
         .listStyle(.insetGrouped)
         .confirmationDialog("Delete this note?", isPresented: $showDeleteConfirm, presenting: noteToDelete) { note in
-            Button("Delete "\(note.title)"", role: .destructive) {
+            Button("Delete \"\(note.displayTitle)\"", role: .destructive) {
                 Task { await notesVM.deleteNote(note) }
             }
         }
@@ -71,7 +71,7 @@ struct NoteListView: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
             } else {
-                Text("No results for "\(notesVM.searchQuery)"")
+                Text("No results for \"\(notesVM.searchQuery)\"")
                     .font(.title3.bold())
             }
         }
@@ -105,7 +105,7 @@ struct NoteRowView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                Text(note.title)
+                Text(note.displayTitle)
                     .font(.headline)
                     .lineLimit(1)
                 Spacer()
@@ -113,7 +113,7 @@ struct NoteRowView: View {
                     ProgressView()
                         .scaleEffect(0.8)
                 } else {
-                    Text(note.createdAt, format: .relative(presentation: .named))
+                    Text(note.formattedDate)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

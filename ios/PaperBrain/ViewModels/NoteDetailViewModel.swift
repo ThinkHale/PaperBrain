@@ -6,10 +6,10 @@ import SwiftUI
 final class NoteDetailViewModel: ObservableObject {
     @Published var note: Note
     @Published var images: [NoteImage] = []
-    @Published var imageCache: [UUID: UIImage] = [:]
+    @Published var imageCache: [String: UIImage] = [:]
     @Published var annotations: [Annotation] = []
     @Published var relations: [Relation] = []
-    @Published var relatedNotes: [UUID: Note] = [:]
+    @Published var relatedNotes: [String: Note] = [:]
     @Published var isLoading = false
     @Published var isSaving = false
     @Published var error: String?
@@ -37,7 +37,7 @@ final class NoteDetailViewModel: ObservableObject {
 
     init(note: Note) {
         self.note = note
-        self.editingTitle = note.title
+        self.editingTitle = note.displayTitle
         self.editingOrganized = note.organized ?? ""
     }
 
@@ -89,14 +89,14 @@ final class NoteDetailViewModel: ObservableObject {
     // MARK: - Editing
 
     func saveTitle() async {
-        guard editingTitle != note.title, !editingTitle.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        guard editingTitle != note.displayTitle, !editingTitle.trimmingCharacters(in: .whitespaces).isEmpty else { return }
         isSaving = true
         do {
             try await db.updateNoteTitle(noteId: note.id, title: editingTitle)
             note.title = editingTitle
         } catch {
             self.error = error.localizedDescription
-            editingTitle = note.title
+            editingTitle = note.displayTitle
         }
         isSaving = false
     }
@@ -157,8 +157,8 @@ final class NoteDetailViewModel: ObservableObject {
     }
 
     func reprocessAnnotationRegion(_ annotation: Annotation, sourceImage: UIImage) async {
-        guard let shapeData = annotation.shapeData as? Annotation.ShapeData,
-              let x = shapeData.x, let y = shapeData.y,
+        let shapeData = annotation.shapeData
+        guard let x = shapeData.x, let y = shapeData.y,
               let w = shapeData.width, let h = shapeData.height else { return }
 
         let rect = CGRect(x: x, y: y, width: w, height: h)
@@ -186,7 +186,6 @@ final class NoteDetailViewModel: ObservableObject {
 
     private func checkForUnclearWords() {
         guard let transcription = note.transcription else { return }
-        let pattern = /\[unclear\]/
         let snippets = transcription.components(separatedBy: .newlines)
         unclearWords = snippets.compactMap { line in
             guard line.contains("[unclear]") else { return nil }

@@ -16,13 +16,54 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const { supabaseUrl, supabaseAnonKey } = window.PAPERBRAIN_CONFIG ?? {};
 
-if (!supabaseUrl || supabaseUrl === "YOUR_SUPABASE_URL") {
+function hasValidConfig(url, key) {
+  if (!url || !key) return false;
+  if (url === "YOUR_SUPABASE_URL" || key === "YOUR_SUPABASE_ANON_KEY") return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" && key.length > 20;
+  } catch {
+    return false;
+  }
+}
+
+export const isConfigured = hasValidConfig(supabaseUrl, supabaseAnonKey);
+
+export const configError =
+  "Supabase is not configured. Edit config.js with your project URL and anon key, then reload.";
+
+if (!isConfigured) {
   console.warn(
-    "[PaperBrain] Supabase not configured. Edit config.js with your project URL and anon key.",
+    "[PaperBrain] " + configError,
   );
 }
 
-export const client = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "");
+function missingConfigClient() {
+  const fail = () => {
+    throw new Error(configError);
+  };
+  return {
+    auth: {
+      getSession: async () => ({ data: { session: null }, error: null }),
+      getUser: async () => fail(),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
+      signUp: async () => fail(),
+      signInWithPassword: async () => fail(),
+      signOut: async () => {},
+    },
+    functions: {
+      setAuth() {},
+    },
+    from: () => ({ select: fail }),
+    storage: {
+      from: () => ({ createSignedUrls: fail }),
+    },
+  };
+}
+
+export const client = isConfigured
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : missingConfigClient();
 
 let _session = null;
 const _listeners = new Set();
@@ -34,6 +75,8 @@ function _notify(session) {
 
 /** Call once at app start. Returns the initial user (or null). */
 export async function init() {
+  if (!isConfigured) return null;
+
   const { data: { session } } = await client.auth.getSession();
   _session = session;
 

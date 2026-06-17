@@ -44,7 +44,7 @@ struct NoteDetailView: View {
                 AnnotationCanvasView(
                     image: vm.imageCache[vm.images[annotationImageIndex].id] ?? UIImage(),
                     noteImage: vm.images[annotationImageIndex],
-                    existingAnnotations: vm.annotations.filter { $0.imageId == vm.images[annotationImageIndex].id }
+                    existingAnnotations: vm.annotations.filter { $0.imageIndex == (vm.images[annotationImageIndex].pageNumber ?? 0) }
                 ) { newAnnotation in
                     Task { await vm.addAnnotation(newAnnotation) }
                 } onDelete: { annotation in
@@ -57,9 +57,6 @@ struct NoteDetailView: View {
                 lightbox(img)
             }
         }
-        .onChange(of: vm.completedNote) { _, note in
-            if let note { notesVM.replace(note) }
-        }
     }
 
     // MARK: - Sections
@@ -71,10 +68,10 @@ struct NoteDetailView: View {
                     .font(.title2.bold())
                     .textFieldStyle(.roundedBorder)
             } else {
-                Text(vm.note.title)
+                Text(vm.note.displayTitle)
                     .font(.title2.bold())
             }
-            Text(vm.note.createdAt, format: .dateTime)
+            Text(vm.note.formattedDate)
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }
@@ -137,7 +134,7 @@ struct NoteDetailView: View {
                                         .overlay(ProgressView())
                                 }
                                 // Annotation count badge
-                                let annCount = vm.annotations.filter { $0.imageId == ni.id }.count
+                                let annCount = vm.annotations.filter { $0.imageIndex == (ni.pageNumber ?? 0) }.count
                                 if annCount > 0 {
                                     Text("\(annCount)")
                                         .font(.caption2.bold())
@@ -231,7 +228,7 @@ struct NoteDetailView: View {
                 if let other = vm.relatedNotes[otherId] {
                     HStack {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(other.title)
+                            Text(other.displayTitle)
                                 .font(.subheadline.bold())
                             if let reason = rel.reason {
                                 Text(reason)
@@ -287,19 +284,9 @@ struct NoteDetailView: View {
             }
 
             ShareLink(item: notesVM.exportMarkdown(for: vm.note),
-                      preview: SharePreview(vm.note.title)) {
+                      preview: SharePreview(vm.note.displayTitle)) {
                 Image(systemName: "square.and.arrow.up")
             }
         }
     }
-
-    // Needed to forward completed note back to list
-    private var completedNoteBinding: Binding<Note?> {
-        Binding(get: { nil }, set: { _ in })
-    }
-}
-
-// Workaround: expose completed note up to NotesViewModel
-extension NoteDetailViewModel {
-    var completedNote: Note? { nil } // placeholder — update triggers handled via replace()
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-enum ShapeType: String, Codable {
+enum ShapeType: String, Codable, CaseIterable {
     case rect = "rect"
     case ellipse = "ellipse"
     case freehand = "freehand"
@@ -41,12 +41,30 @@ struct ShapeData: Codable {
         self.x = x; self.y = y; self.w = w; self.h = h
     }
 
+    init(x: Double?, y: Double?, width: Double?, height: Double?, points: [[Double]]?) {
+        self.x = x
+        self.y = y
+        self.w = width
+        self.h = height
+        self.points = points
+    }
+
     init(cx: Double, cy: Double, rx: Double, ry: Double) {
         self.cx = cx; self.cy = cy; self.rx = rx; self.ry = ry
     }
 
     init(points: [[Double]]) {
         self.points = points
+    }
+
+    var width: Double? {
+        get { w }
+        set { w = newValue }
+    }
+
+    var height: Double? {
+        get { h }
+        set { h = newValue }
     }
 }
 

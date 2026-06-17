@@ -58,7 +58,7 @@ final class NotesViewModel: ObservableObject {
         }
         let q = searchQuery.lowercased()
         filteredNotes = notes.filter { note in
-            note.title.lowercased().contains(q) ||
+            note.displayTitle.lowercased().contains(q) ||
             (note.summary?.lowercased().contains(q) ?? false) ||
             (note.transcription?.lowercased().contains(q) ?? false) ||
             (note.tags?.joined(separator: " ").lowercased().contains(q) ?? false) ||
@@ -69,7 +69,7 @@ final class NotesViewModel: ObservableObject {
     // MARK: - Export
 
     func exportMarkdown(for note: Note) -> String {
-        var md = "# \(note.title)\n\n"
+        var md = "# \(note.displayTitle)\n\n"
         if let summary = note.summary { md += "**Summary:** \(summary)\n\n" }
         if let tags = note.tags, !tags.isEmpty { md += "**Tags:** \(tags.joined(separator: ", "))\n\n" }
         if let kp = note.keyPoints, !kp.isEmpty {

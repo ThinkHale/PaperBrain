@@ -18,7 +18,7 @@ final class ProfileViewModel: ObservableObject {
             let p = try await db.fetchProfile(userId: userId)
             profile = p
             displayName = p.displayName ?? ""
-            selectedModel = p.claudeModel
+            selectedModel = p.modelName
         } catch {
             self.error = error.localizedDescription
         }
@@ -32,7 +32,7 @@ final class ProfileViewModel: ObservableObject {
             try await db.updateProfile(
                 id: userId,
                 displayName: displayName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : displayName,
-                claudeModel: selectedModel
+                model: selectedModel
             )
             saveSuccess = true
         } catch {

@@ -10,8 +10,8 @@ final class SupabaseService {
 
     private init() {
         client = SupabaseClient(
-            supabaseURL: AppConfig.supabaseURL,
-            supabaseKey: AppConfig.supabaseAnonKey
+            supabaseURL: URL(string: Config.supabaseURL)!,
+            supabaseKey: Config.supabaseAnonKey
         )
     }
 
@@ -42,20 +42,20 @@ final class SupabaseService {
         return profile
     }
 
-    func updateProfile(id: UUID, displayName: String?, claudeModel: String) async throws {
+    func updateProfile(id: UUID, displayName: String?, model: String) async throws {
         struct Update: Encodable {
             let displayName: String?
-            let claudeModel: String
+            let model: String
             let updatedAt: String
             enum CodingKeys: String, CodingKey {
                 case displayName = "display_name"
-                case claudeModel = "claude_model"
+                case model
                 case updatedAt = "updated_at"
             }
         }
         try await client
             .from("profiles")
-            .update(Update(displayName: displayName, claudeModel: claudeModel, updatedAt: ISO8601DateFormatter().string(from: Date())))
+            .update(Update(displayName: displayName, model: model, updatedAt: ISO8601DateFormatter().string(from: Date())))
             .eq("id", value: id.uuidString)
             .execute()
     }
@@ -72,11 +72,11 @@ final class SupabaseService {
             .value
     }
 
-    func fetchNote(id: UUID) async throws -> Note {
+    func fetchNote(id: String) async throws -> Note {
         let notes: [Note] = try await client
             .from("notes")
             .select()
-            .eq("id", value: id.uuidString)
+            .eq("id", value: id)
             .limit(1)
             .execute()
             .value
@@ -84,7 +84,7 @@ final class SupabaseService {
         return note
     }
 
-    func updateNoteTitle(noteId: UUID, title: String) async throws {
+    func updateNoteTitle(noteId: String, title: String) async throws {
         struct Update: Encodable {
             let title: String
             let updatedAt: String
@@ -96,11 +96,11 @@ final class SupabaseService {
         try await client
             .from("notes")
             .update(Update(title: title, updatedAt: ISO8601DateFormatter().string(from: Date())))
-            .eq("id", value: noteId.uuidString)
+            .eq("id", value: noteId)
             .execute()
     }
 
-    func updateNoteTags(noteId: UUID, tags: [String]) async throws {
+    func updateNoteTags(noteId: String, tags: [String]) async throws {
         struct Update: Encodable {
             let tags: [String]
             let updatedAt: String
@@ -112,11 +112,11 @@ final class SupabaseService {
         try await client
             .from("notes")
             .update(Update(tags: tags, updatedAt: ISO8601DateFormatter().string(from: Date())))
-            .eq("id", value: noteId.uuidString)
+            .eq("id", value: noteId)
             .execute()
     }
 
-    func updateNoteOrganized(noteId: UUID, organized: String) async throws {
+    func updateNoteOrganized(noteId: String, organized: String) async throws {
         struct Update: Encodable {
             let organized: String
             let updatedAt: String
@@ -128,25 +128,25 @@ final class SupabaseService {
         try await client
             .from("notes")
             .update(Update(organized: organized, updatedAt: ISO8601DateFormatter().string(from: Date())))
-            .eq("id", value: noteId.uuidString)
+            .eq("id", value: noteId)
             .execute()
     }
 
-    func deleteNote(id: UUID) async throws {
+    func deleteNote(id: String) async throws {
         try await client
             .from("notes")
             .delete()
-            .eq("id", value: id.uuidString)
+            .eq("id", value: id)
             .execute()
     }
 
     // MARK: - Note Images
 
-    func fetchNoteImages(noteId: UUID) async throws -> [NoteImage] {
+    func fetchNoteImages(noteId: String) async throws -> [NoteImage] {
         try await client
             .from("note_images")
             .select()
-            .eq("note_id", value: noteId.uuidString)
+            .eq("note_id", value: noteId)
             .order("page_number", ascending: true)
             .execute()
             .value
@@ -154,23 +154,58 @@ final class SupabaseService {
 
     // MARK: - Annotations
 
-    func fetchAnnotations(noteId: UUID) async throws -> [Annotation] {
+    func fetchAnnotations(noteId: String) async throws -> [Annotation] {
         try await client
             .from("annotations")
             .select()
-            .eq("note_id", value: noteId.uuidString)
+            .eq("note_id", value: noteId)
             .execute()
             .value
     }
 
     func insertAnnotation(_ annotation: Annotation) async throws {
+        let session = try await client.auth.session
+        struct Insert: Encodable {
+            let noteId: String
+            let userId: UUID
+            let imageIndex: Int
+            let shapeType: ShapeType
+            let shapeData: ShapeData
+            let tag: String?
+            let label: String?
+            let color: String?
+            let regionContent: String?
+
+            enum CodingKeys: String, CodingKey {
+                case noteId = "note_id"
+                case userId = "user_id"
+                case imageIndex = "image_index"
+                case shapeType = "shape_type"
+                case shapeData = "shape_data"
+                case tag
+                case label
+                case color
+                case regionContent = "region_content"
+            }
+        }
+        let row = Insert(
+            noteId: annotation.noteId,
+            userId: session.user.id,
+            imageIndex: annotation.imageIndex,
+            shapeType: annotation.shapeType,
+            shapeData: annotation.shapeData,
+            tag: annotation.tag,
+            label: annotation.label,
+            color: annotation.color,
+            regionContent: annotation.regionContent
+        )
         try await client
             .from("annotations")
-            .insert(annotation)
+            .insert(row)
             .execute()
     }
 
-    func updateAnnotationContent(id: UUID, regionContent: String) async throws {
+    func updateAnnotationContent(id: String, regionContent: String) async throws {
         struct Update: Encodable {
             let regionContent: String
             enum CodingKeys: String, CodingKey { case regionContent = "region_content" }
@@ -178,32 +213,32 @@ final class SupabaseService {
         try await client
             .from("annotations")
             .update(Update(regionContent: regionContent))
-            .eq("id", value: id.uuidString)
+            .eq("id", value: id)
             .execute()
     }
 
-    func deleteAnnotation(id: UUID) async throws {
+    func deleteAnnotation(id: String) async throws {
         try await client
             .from("annotations")
             .delete()
-            .eq("id", value: id.uuidString)
+            .eq("id", value: id)
             .execute()
     }
 
     // MARK: - Relations
 
-    func fetchRelations(noteId: UUID) async throws -> [Relation] {
+    func fetchRelations(noteId: String) async throws -> [Relation] {
         // Fetch where note is either end of the relation
         let asFrom: [Relation] = try await client
             .from("relations")
             .select()
-            .eq("from_id", value: noteId.uuidString)
+            .eq("from_id", value: noteId)
             .execute()
             .value
         let asTo: [Relation] = try await client
             .from("relations")
             .select()
-            .eq("to_id", value: noteId.uuidString)
+            .eq("to_id", value: noteId)
             .execute()
             .value
         return (asFrom + asTo).sorted { $0.score > $1.score }
@@ -218,13 +253,15 @@ final class SupabaseService {
             .value
     }
 
-    func insertManualRelation(fromId: UUID, toId: UUID) async throws {
+    func insertManualRelation(fromId: String, toId: String, userId: UUID) async throws {
         struct NewRelation: Encodable {
-            let fromId: UUID
-            let toId: UUID
+            let userId: UUID
+            let fromId: String
+            let toId: String
             let score: Double
             let manual: Bool
             enum CodingKeys: String, CodingKey {
+                case userId = "user_id"
                 case fromId = "from_id"
                 case toId = "to_id"
                 case score, manual
@@ -232,15 +269,15 @@ final class SupabaseService {
         }
         try await client
             .from("relations")
-            .insert(NewRelation(fromId: fromId, toId: toId, score: 1.0, manual: true))
+            .insert(NewRelation(userId: userId, fromId: fromId, toId: toId, score: 1.0, manual: true))
             .execute()
     }
 
-    func deleteRelation(id: UUID) async throws {
+    func deleteRelation(id: String) async throws {
         try await client
             .from("relations")
             .delete()
-            .eq("id", value: id.uuidString)
+            .eq("id", value: id)
             .execute()
     }
 
@@ -264,14 +301,16 @@ final class SupabaseService {
             .value
     }
 
-    func upsertMindmapPosition(userId: UUID, nodeId: String, x: Double, y: Double) async throws {
+    func upsertMindmapPosition(userId: UUID, nodeType: String, nodeId: String, x: Double, y: Double) async throws {
         struct Upsert: Encodable {
             let userId: UUID
+            let nodeType: String
             let nodeId: String
             let x, y: Double
             let updatedAt: String
             enum CodingKeys: String, CodingKey {
                 case userId = "user_id"
+                case nodeType = "node_type"
                 case nodeId = "node_id"
                 case x, y
                 case updatedAt = "updated_at"
@@ -279,8 +318,8 @@ final class SupabaseService {
         }
         try await client
             .from("mindmap_positions")
-            .upsert(Upsert(userId: userId, nodeId: nodeId, x: x, y: y, updatedAt: ISO8601DateFormatter().string(from: Date())),
-                    onConflict: "user_id,node_id")
+            .upsert(Upsert(userId: userId, nodeType: nodeType, nodeId: nodeId, x: x, y: y, updatedAt: ISO8601DateFormatter().string(from: Date())),
+                    onConflict: "user_id,node_type,node_id")
             .execute()
     }
 }

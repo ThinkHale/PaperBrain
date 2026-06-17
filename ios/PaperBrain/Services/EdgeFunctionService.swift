@@ -11,7 +11,7 @@ private struct ProcessNotePayload: Encodable {
 
     enum CodingKeys: String, CodingKey {
         case images, mode, tag
-        case noteId = "note_id"
+        case noteId
     }
 }
 
@@ -29,11 +29,10 @@ struct ProcessNoteResponse: Decodable {
 
 private struct FindRelationsPayload: Encodable {
     let noteId: String
-    enum CodingKeys: String, CodingKey { case noteId = "note_id" }
 }
 
 private struct LearnHandwritingPayload: Encodable {
-    // Edge function reads corrections from DB; we just trigger it
+    // Edge function accepts an empty body as a synthesis trigger.
     let userId: String
     enum CodingKeys: String, CodingKey { case userId = "user_id" }
 }
@@ -60,8 +59,8 @@ final class EdgeFunctionService {
     }
 
     /// Re-process a cropped annotation region.
-    func processRegion(image: String, tag: String?, noteId: UUID) async throws -> ProcessNoteResponse.RegionResult {
-        let payload = ProcessNotePayload(images: [image], mode: "region", tag: tag, noteId: noteId.uuidString)
+    func processRegion(image: String, tag: String?, noteId: String) async throws -> ProcessNoteResponse.RegionResult {
+        let payload = ProcessNotePayload(images: [image], mode: "region", tag: tag, noteId: noteId)
         let response: ProcessNoteResponse = try await client.functions
             .invoke("process-note", options: FunctionInvokeOptions(body: payload))
         guard let region = response.region else {
@@ -71,9 +70,9 @@ final class EdgeFunctionService {
     }
 
     /// Fire-and-forget: find related notes for a newly created note.
-    func findRelations(noteId: UUID) {
+    func findRelations(noteId: String) {
         Task {
-            let payload = FindRelationsPayload(noteId: noteId.uuidString)
+            let payload = FindRelationsPayload(noteId: noteId)
             _ = try? await client.functions
                 .invoke("find-relations", options: FunctionInvokeOptions(body: payload))
         }

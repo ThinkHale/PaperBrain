@@ -1,15 +1,17 @@
 import Foundation
 
 enum AIModel: String, Codable, CaseIterable {
-    case sonnet4 = "claude-sonnet-4-20250514"
-    case haiku4 = "claude-haiku-4-5-20251001"
-    case opus4 = "claude-opus-4-20250514"
+    case gpt54Mini = "gpt-5.4-mini"
+    case gpt54Nano = "gpt-5.4-nano"
+    case gpt54 = "gpt-5.4"
+    case gpt55 = "gpt-5.5"
 
     var displayName: String {
         switch self {
-        case .sonnet4: return "Claude Sonnet 4"
-        case .haiku4: return "Claude Haiku 4.5"
-        case .opus4: return "Claude Opus 4"
+        case .gpt54Mini: return "GPT-5.4 mini"
+        case .gpt54Nano: return "GPT-5.4 nano"
+        case .gpt54: return "GPT-5.4"
+        case .gpt55: return "GPT-5.5"
         }
     }
 }
@@ -32,7 +34,13 @@ struct Profile: Codable, Identifiable {
     }
 
     var aiModel: AIModel {
-        guard let m = model else { return .sonnet4 }
-        return AIModel(rawValue: m) ?? .sonnet4
+        guard let m = model else { return .gpt54Mini }
+        return AIModel(rawValue: m) ?? .gpt54Mini
+    }
+
+    static let availableModels = AIModel.allCases.map(\.rawValue)
+
+    var modelName: String {
+        aiModel.rawValue
     }
 }

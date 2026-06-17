@@ -53,15 +53,15 @@ struct ProfileView: View {
 
     private var modelSection: some View {
         Section {
-            Picker("Claude Model", selection: $vm.selectedModel) {
+            Picker("OpenAI Model", selection: $vm.selectedModel) {
                 ForEach(Profile.availableModels, id: \.self) { model in
-                    Text(model).tag(model)
+                    Text(AIModel(rawValue: model)?.displayName ?? model).tag(model)
                 }
             }
         } header: {
             Text("AI Model")
         } footer: {
-            Text("Opus is most capable but slower. Haiku is fastest. Sonnet is a balance.")
+            Text("GPT-5.4 mini is the default balance. GPT-5.4 nano is fastest. GPT-5.5 is most capable.")
                 .font(.caption)
         }
     }

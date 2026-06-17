@@ -5,9 +5,9 @@ struct Relation: Codable, Identifiable {
     let userId: String?
     let fromId: String
     let toId: String
-    let score: Double?
+    let score: Double
     let reason: String?
-    let manual: Bool?
+    let manual: Bool
     let createdAt: String?
 
     enum CodingKeys: String, CodingKey {
@@ -19,5 +19,11 @@ struct Relation: Codable, Identifiable {
         case reason
         case manual
         case createdAt = "created_at"
+    }
+}
+
+extension Relation {
+    func otherNoteId(relativeTo noteId: String) -> String {
+        fromId == noteId ? toId : fromId
     }
 }

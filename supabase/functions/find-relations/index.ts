@@ -1,18 +1,16 @@
 /**
- * find-relations — Supabase Edge Function
+ * find-relations - Supabase Edge Function
  *
- * Finds related notes for a newly created note using Claude.
- * Called in the background after a note is saved.
+ * Finds related notes for a note using OpenAI.
  *
  * POST /functions/v1/find-relations
  * Auth: Bearer <supabase-access-token>
- * Body: { noteId: string }
+ * Body: { noteId: string } or { note_id: string }
  */
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const ANTHROPIC_URL = "https://api.anthropic.com/v1/messages";
-const ANTHROPIC_VER = "2023-06-01";
+const OPENAI_URL = "https://api.openai.com/v1/responses";
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -29,24 +27,19 @@ Deno.serve(async (req) => {
     const accessToken = authHeader.replace(/^Bearer\s+/i, "").trim();
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const supabase = createClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      { global: { headers: { authorization: authHeader } } },
-    );
 
     const user = await getUserFromAccessToken(supabaseUrl, supabaseAnonKey, accessToken);
     if (!user) return json({ error: "Unauthorized" }, 401);
 
     const admin = createClient(
-      Deno.env.get("SUPABASE_URL")!,
+      supabaseUrl,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const { noteId } = await req.json();
+    const body = await req.json();
+    const noteId = body.noteId ?? body.note_id;
     if (!noteId) return json({ error: "noteId required" }, 400);
 
-    // ── Load the new note ─────────────────────────────────────
     const { data: newNote } = await admin
       .from("notes")
       .select("id, title, summary, tags")
@@ -56,7 +49,6 @@ Deno.serve(async (req) => {
 
     if (!newNote) return json({ error: "Note not found" }, 404);
 
-    // ── Load up to 40 other notes for comparison ──────────────
     const { data: candidates } = await admin
       .from("notes")
       .select("id, title, summary, tags")
@@ -68,9 +60,8 @@ Deno.serve(async (req) => {
 
     if (!candidates?.length) return json({ ok: true, relations: [] });
 
-    // ── Call Claude ───────────────────────────────────────────
     const prompt =
-      `You are finding connections between notes.
+      `Find connections between notes.
 
 NEW NOTE:
 Title: ${newNote.title}
@@ -80,59 +71,52 @@ Tags: ${(newNote.tags ?? []).join(", ")}
 EXISTING NOTES:
 ${JSON.stringify(candidates.map((n) => ({ id: n.id, title: n.title, summary: n.summary, tags: n.tags })), null, 2)}
 
-Return a JSON array of the most related existing notes (up to 5).
-Only include notes with meaningful topical overlap (score ≥ 0.45).
+Return the most related existing notes, up to 5.
+Only include notes with meaningful topical overlap. Use scores from 0 to 1, and only include scores >= 0.45.
+The id must exactly match one of the existing note IDs.`;
 
-[
-  {
-    "id": "note-uuid",
-    "score": 0.85,
-    "reason": "One concise sentence explaining the connection."
-  }
-]
-
-Return ONLY the JSON array. If no notes are sufficiently related, return [].`;
-
-    const anthropicKey = Deno.env.get("ANTHROPIC_API_KEY")!;
+    const openaiKey = Deno.env.get("OPENAI_API_KEY")!;
     const { data: profile } = await admin
       .from("profiles")
       .select("model")
       .eq("id", user.id)
       .single();
 
-    const aiRes = await fetch(ANTHROPIC_URL, {
+    const aiRes = await fetch(OPENAI_URL, {
       method: "POST",
       headers: {
+        "authorization": `Bearer ${openaiKey}`,
         "content-type": "application/json",
-        "x-api-key": anthropicKey,
-        "anthropic-version": ANTHROPIC_VER,
       },
       body: JSON.stringify({
-        model: resolveAnthropicModel(profile?.model),
-        max_tokens: 1024,
-        messages: [{
-          role: "user",
-          content: [{ type: "text", text: prompt }],
-        }],
+        model: resolveOpenAIModel(profile?.model),
+        store: false,
+        max_output_tokens: 1200,
+        text: {
+          format: {
+            type: "json_schema",
+            name: "paperbrain_relations",
+            strict: true,
+            schema: relationSchema(),
+          },
+        },
+        input: prompt,
       }),
     });
 
-    if (!aiRes.ok) throw new Error(`Anthropic ${aiRes.status}`);
-
-    const aiData = await aiRes.json();
-    const raw: string = aiData.content[0].text;
-
-    let related: { id: string; score: number; reason: string }[] = [];
-    try {
-      const match = raw.match(/\[[\s\S]*\]/);
-      if (match) related = JSON.parse(match[0]);
-    } catch (_) {
-      related = [];
+    if (!aiRes.ok) {
+      const err = await aiRes.json().catch(() => ({}));
+      throw new Error(err.error?.message ?? `OpenAI error ${aiRes.status}`);
     }
 
-    if (!related.length) return json({ ok: true, relations: [] });
+    const aiData = await aiRes.json();
+    const parsed = parseJSON(extractOutputText(aiData));
+    const candidateIds = new Set(candidates.map((n) => n.id));
+    const related = ((parsed.relations ?? []) as { id: string; score: number; reason: string }[])
+      .filter((r) => candidateIds.has(r.id))
+      .filter((r) => Number.isFinite(r.score) && r.score >= 0.45)
+      .slice(0, 5);
 
-    // ── Delete old AI relations for this note (keep manual) ───
     await admin
       .from("relations")
       .delete()
@@ -140,7 +124,8 @@ Return ONLY the JSON array. If no notes are sufficiently related, return [].`;
       .eq("user_id", user.id)
       .eq("manual", false);
 
-    // ── Save new relations ────────────────────────────────────
+    if (!related.length) return json({ ok: true, relations: [] });
+
     const rows = related.map((r) => ({
       user_id: user.id,
       from_id: noteId,
@@ -150,10 +135,13 @@ Return ONLY the JSON array. If no notes are sufficiently related, return [].`;
       manual: false,
     }));
 
-    const { error: relErr } = await admin.from("relations").insert(rows);
+    const { data: saved, error: relErr } = await admin
+      .from("relations")
+      .upsert(rows, { onConflict: "from_id,to_id" })
+      .select();
     if (relErr) throw relErr;
 
-    return json({ ok: true, relations: rows });
+    return json({ ok: true, relations: saved ?? rows });
   } catch (err) {
     console.error("[find-relations]", err);
     return json({ error: String(err) }, 500);
@@ -165,6 +153,25 @@ function json(body: unknown, status = 200) {
     status,
     headers: { ...CORS, "content-type": "application/json" },
   });
+}
+
+function parseJSON(text: string) {
+  const match = text.trim().match(/\{[\s\S]*\}/);
+  if (!match) throw new Error("No JSON in AI response");
+  return JSON.parse(match[0]);
+}
+
+function extractOutputText(response: any): string {
+  if (typeof response.output_text === "string") return response.output_text;
+  const chunks: string[] = [];
+  for (const item of response.output ?? []) {
+    for (const content of item.content ?? []) {
+      if (typeof content.text === "string") chunks.push(content.text);
+    }
+  }
+  const text = chunks.join("\n").trim();
+  if (!text) throw new Error("No text in OpenAI response");
+  return text;
 }
 
 async function getUserFromAccessToken(supabaseUrl: string, supabaseAnonKey: string, accessToken: string) {
@@ -181,14 +188,37 @@ async function getUserFromAccessToken(supabaseUrl: string, supabaseAnonKey: stri
   return await res.json();
 }
 
-function resolveAnthropicModel(model?: string | null) {
+function resolveOpenAIModel(model?: string | null) {
   switch (model) {
-    case "claude-opus-4-6":
-      return "claude-opus-4-20250514";
-    case "claude-haiku-4-5-20251001":
-      return "claude-haiku-4-5-20251001";
-    case "claude-sonnet-4-6":
+    case "gpt-5.5":
+    case "gpt-5.4":
+    case "gpt-5.4-mini":
+    case "gpt-5.4-nano":
+      return model;
     default:
-      return "claude-sonnet-4-20250514";
+      return "gpt-5.4-mini";
   }
+}
+
+function relationSchema() {
+  return {
+    type: "object",
+    additionalProperties: false,
+    required: ["relations"],
+    properties: {
+      relations: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: ["id", "score", "reason"],
+          properties: {
+            id: { type: "string" },
+            score: { type: "number" },
+            reason: { type: "string" },
+          },
+        },
+      },
+    },
+  };
 }

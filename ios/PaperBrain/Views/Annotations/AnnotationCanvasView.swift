@@ -10,7 +10,7 @@ struct AnnotationCanvasView: View {
     let onAdd: (Annotation) -> Void
     let onDelete: (Annotation) -> Void
 
-    @State private var selectedTool: Annotation.ShapeType = .rect
+    @State private var selectedTool: ShapeType = .rect
     @State private var tagInput = ""
     @State private var showTagPrompt = false
     @State private var pendingShape: PendingShape?
@@ -69,7 +69,7 @@ struct AnnotationCanvasView: View {
 
     private var toolBar: some View {
         HStack(spacing: 24) {
-            ForEach(Annotation.ShapeType.allCases, id: \.self) { tool in
+            ForEach(ShapeType.allCases, id: \.self) { tool in
                 Button {
                     selectedTool = tool
                 } label: {
@@ -102,14 +102,17 @@ struct AnnotationCanvasView: View {
         guard let pending = pendingShape else { return }
 
         let annotation = Annotation(
-            id: UUID(),
+            id: UUID().uuidString,
             noteId: noteImage.noteId,
-            imageId: noteImage.id,
+            userId: nil,
+            imageIndex: noteImage.pageNumber ?? 0,
             shapeType: pending.shapeType,
             shapeData: pending.shapeData,
             tag: tag?.trimmingCharacters(in: .whitespaces).lowercased(),
+            label: tag?.trimmingCharacters(in: .whitespaces).lowercased(),
+            color: nil,
             regionContent: nil,
-            createdAt: Date()
+            createdAt: ISO8601DateFormatter().string(from: Date())
         )
         onAdd(annotation)
     }
@@ -118,8 +121,8 @@ struct AnnotationCanvasView: View {
 // MARK: - PendingShape
 
 struct PendingShape {
-    let shapeType: Annotation.ShapeType
-    let shapeData: Annotation.ShapeData
+    let shapeType: ShapeType
+    let shapeData: ShapeData
 }
 
 // MARK: - Canvas UIView overlay
@@ -127,7 +130,7 @@ struct PendingShape {
 struct CanvasOverlay: UIViewRepresentable {
     let imageSize: CGSize
     let containerSize: CGSize
-    let tool: Annotation.ShapeType
+    let tool: ShapeType
     let existingAnnotations: [Annotation]
     let onShapeFinished: (PendingShape) -> Void
     let onDeleteAnnotation: (Annotation) -> Void
@@ -158,7 +161,7 @@ struct CanvasOverlay: UIViewRepresentable {
     final class Coordinator {
         var imageSize: CGSize
         var containerSize: CGSize
-        var currentTool: Annotation.ShapeType = .rect
+        var currentTool: ShapeType = .rect
         var existingAnnotations: [Annotation] = []
         let onShapeFinished: (PendingShape) -> Void
         let onDeleteAnnotation: (Annotation) -> Void
@@ -240,7 +243,7 @@ final class AnnotationDrawingView: UIView {
             let x = min(n0.x, n1.x), y = min(n0.y, n1.y)
             let w = abs(n1.x - n0.x), h = abs(n1.y - n0.y)
             guard w > 0.01, h > 0.01 else { return }
-            let data = Annotation.ShapeData(x: x, y: y, width: w, height: h, points: nil)
+            let data = ShapeData(x: x, y: y, width: w, height: h, points: nil)
             coord.onShapeFinished(PendingShape(shapeType: coord.currentTool, shapeData: data))
 
         case .freehand:
@@ -249,7 +252,7 @@ final class AnnotationDrawingView: UIView {
                 return [n.x, n.y]
             }
             guard normalized.count > 2 else { return }
-            let data = Annotation.ShapeData(x: nil, y: nil, width: nil, height: nil, points: normalized)
+            let data = ShapeData(x: nil, y: nil, width: nil, height: nil, points: normalized)
             coord.onShapeFinished(PendingShape(shapeType: .freehand, shapeData: data))
         }
         coord.drawStart = nil
@@ -368,7 +371,7 @@ final class AnnotationDrawingView: UIView {
 
 // MARK: - Tool display helpers
 
-extension Annotation.ShapeType {
+extension ShapeType {
     var iconName: String {
         switch self {
         case .rect: return "rectangle"

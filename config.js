@@ -10,6 +10,6 @@
  * private repo.
  */
 window.PAPERBRAIN_CONFIG = {
-  supabaseUrl:     "https://ddqoqxxzhfhhwxhlxfxm.supabase.co",
-  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRkcW9xeHh6aGZoaHd4aGx4ZnhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1NzgwNjAsImV4cCI6MjA5MDE1NDA2MH0.6vSrc6PGnM-RCXjm3lBcS2pQRn-GpGH4QA1ixfS4PIU",
+  supabaseUrl:     "https://lqqijkauvnnirgcmstji.supabase.co",
+  supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxxcWlqa2F1dm5uaXJnY21zdGppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NTUwODYsImV4cCI6MjA5NzIzMTA4Nn0._z85n5AsSV8w-zI4EZajVrVZG1cxJmGzZwokIHi9eUc",
 };

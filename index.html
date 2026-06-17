@@ -9,6 +9,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <!-- marked.js -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- DOMPurify for safe Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.7/dist/purify.min.js"></script>
   <!-- D3.js for mind map -->
   <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 </head>
@@ -321,9 +323,10 @@
       <section class="profile-section">
         <h3>AI Model</h3>
         <select id="model-select">
-          <option value="claude-sonnet-4-20250514">Claude Sonnet 4 (recommended)</option>
-          <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 (fast)</option>
-          <option value="claude-opus-4-20250514">Claude Opus 4 (most capable)</option>
+          <option value="gpt-5.4-mini">GPT-5.4 mini (recommended)</option>
+          <option value="gpt-5.4-nano">GPT-5.4 nano (fastest)</option>
+          <option value="gpt-5.4">GPT-5.4 (more capable)</option>
+          <option value="gpt-5.5">GPT-5.5 (most capable)</option>
         </select>
       </section>
 

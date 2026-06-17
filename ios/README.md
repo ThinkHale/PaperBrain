@@ -68,8 +68,8 @@ Open `Info.plist` (or the target's **Info** tab) and add these keys:
 Open `Config.swift` and confirm the URL and anon key match your Supabase project:
 
 ```swift
-enum AppConfig {
-    static let supabaseURL = URL(string: "https://YOUR_PROJECT.supabase.co")!
+enum Config {
+    static let supabaseURL = "https://YOUR_PROJECT.supabase.co"
     static let supabaseAnonKey = "YOUR_ANON_KEY"
 }
 ```
@@ -97,7 +97,7 @@ Select an iPhone simulator (or physical device) and press **⌘R**.
 | Export | `.md` / `.json` download | `ShareLink` (markdown + JSON) |
 | Profile / model select | localStorage + Supabase | Same Supabase `profiles` table |
 
-All AI processing still happens **server-side** in the existing Supabase Edge Functions, so the Anthropic API key is never exposed to the device.
+All AI processing still happens **server-side** in the existing Supabase Edge Functions, so the OpenAI API key is never exposed to the device.
 
 ---
 
@@ -115,7 +115,7 @@ ios/PaperBrain/
 │   ├── Profile.swift
 │   └── Misc.swift             — MindmapPosition, HandwritingCorrection
 ├── Services/
-│   ├── SupabaseService.swift  — Singleton client + all DB CRUD
+│   ├── SupabaseService.swift  — Supabase Swift SDK client + all DB CRUD
 │   ├── StorageService.swift   — Image upload/download + resize/crop helpers
 │   └── EdgeFunctionService.swift — process-note, find-relations, learn-handwriting
 ├── ViewModels/

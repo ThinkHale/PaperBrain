@@ -5,7 +5,17 @@
  * The Supabase client enforces RLS: users only see their own rows.
  */
 
-import { client } from "./auth.js";
+import { client, getUser } from "./auth.js";
+
+async function currentUserId() {
+  const cached = getUser()?.id;
+  if (cached) return cached;
+
+  const { data, error } = await client.auth.getUser();
+  if (error) throw error;
+  if (!data.user?.id) throw new Error("You must be signed in.");
+  return data.user.id;
+}
 
 // ── Notes ──────────────────────────────────────────────────────
 
@@ -74,7 +84,7 @@ export async function searchNotes(query) {
 
 // ── Note Images ────────────────────────────────────────────────
 
-/** Get public URLs for all images attached to a note (ordered by page). */
+/** Get signed URLs for all private images attached to a note (ordered by page). */
 export async function getNoteImageUrls(noteId) {
   const { data, error } = await client
     .from("note_images")
@@ -83,12 +93,15 @@ export async function getNoteImageUrls(noteId) {
     .order("page_number");
   if (error) throw error;
 
-  return (data ?? []).map((row) => {
-    const { data: urlData } = client.storage
-      .from("note-images")
-      .getPublicUrl(row.storage_path);
-    return urlData.publicUrl;
-  });
+  const paths = (data ?? []).map((row) => row.storage_path);
+  if (!paths.length) return [];
+
+  const { data: signed, error: signError } = await client.storage
+    .from("note-images")
+    .createSignedUrls(paths, 60 * 60);
+  if (signError) throw signError;
+
+  return (signed ?? []).map((row) => row.signedUrl);
 }
 
 // ── Annotations ────────────────────────────────────────────────
@@ -117,9 +130,10 @@ export async function saveAnnotation(annotation) {
     if (error) throw error;
     return data;
   } else {
+    const userId = await currentUserId();
     const { data, error } = await client
       .from("annotations")
-      .insert(rest)
+      .insert({ ...rest, user_id: userId })
       .select()
       .single();
     if (error) throw error;
@@ -147,10 +161,11 @@ export async function getRelations(noteId) {
 
 /** Save a manual relation between two notes. */
 export async function saveRelation({ fromId, toId, reason = "", score = 0.8 }) {
+  const userId = await currentUserId();
   const { data, error } = await client
     .from("relations")
     .upsert(
-      { from_id: fromId, to_id: toId, score, reason, manual: true },
+      { user_id: userId, from_id: fromId, to_id: toId, score, reason, manual: true },
       { onConflict: "from_id,to_id" },
     )
     .select()
@@ -183,8 +198,9 @@ export async function getMindmapPositions() {
 
 /** Save (upsert) a node position. */
 export async function saveMindmapPosition({ nodeType, nodeId, x, y }) {
+  const userId = await currentUserId();
   const { error } = await client.from("mindmap_positions").upsert(
-    { node_type: nodeType, node_id: nodeId, x, y, updated_at: new Date().toISOString() },
+    { user_id: userId, node_type: nodeType, node_id: nodeId, x, y, updated_at: new Date().toISOString() },
     { onConflict: "user_id,node_type,node_id" },
   );
   if (error) throw error;
@@ -204,7 +220,8 @@ export async function getProfile() {
 
 /** Update profile fields (model, display_name, etc.). */
 export async function updateProfile(fields) {
-  const { error } = await client.from("profiles").update(fields);
+  const userId = await currentUserId();
+  const { error } = await client.from("profiles").update(fields).eq("id", userId);
   if (error) throw error;
 }
 

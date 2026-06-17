@@ -1,7 +1,7 @@
 /**
  * api.js — Supabase Edge Function client for PaperBrain
  *
- * All requests go to Supabase Edge Functions (server-side Anthropic calls).
+ * All requests go to Supabase Edge Functions (server-side OpenAI calls).
  * No API key is needed on the client — the key lives in the Edge Function secret.
  */
 
@@ -115,9 +115,9 @@ export function cropImage(dataUrl, rect) {
  * Process one or more images (base64 data-URLs) as a note.
  * Returns { ok, note } with the saved note record.
  */
-export async function processNote(images) {
+export async function processNote(images, { noteId } = {}) {
   const resized = await Promise.all(images.map((img) => resizeImage(img)));
-  return callFn("process-note", { images: resized, mode: "full" });
+  return callFn("process-note", { images: resized, mode: "full", noteId });
 }
 
 /**
@@ -135,7 +135,7 @@ export async function processRegion({ imageDataUrl, tag, noteId }) {
 }
 
 /**
- * Ask Claude to find related notes for a given noteId (runs in background).
+ * Ask OpenAI to find related notes for a given noteId (runs in background).
  * Returns { ok, relations }
  */
 export async function findRelations(noteId) {

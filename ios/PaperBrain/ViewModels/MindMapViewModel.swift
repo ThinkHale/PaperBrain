@@ -61,19 +61,19 @@ final class MindMapViewModel: ObservableObject {
     // MARK: - Graph building
 
     private func buildGraph(notes: [Note], relations: [Relation], savedPositions: [MindmapPosition]) {
-        let posMap = Dictionary(uniqueKeysWithValues: savedPositions.map { ($0.nodeId, $0) })
+        let posMap = Dictionary(uniqueKeysWithValues: savedPositions.map { ("\($0.nodeType):\($0.nodeId)", $0) })
         var newNodes: [MapNode] = []
         var newEdges: [MapEdge] = []
 
         // Note nodes
         for note in notes {
-            let saved = posMap[note.id.uuidString]
+            let saved = posMap["note:\(note.id)"]
             let angle = Double.random(in: 0..<(2 * .pi))
             let r = Double.random(in: 100...300)
             newNodes.append(MapNode(
-                id: note.id.uuidString,
+                id: note.id,
                 kind: .note,
-                label: note.title,
+                label: note.displayTitle,
                 x: saved?.x ?? cos(angle) * r,
                 y: saved?.y ?? sin(angle) * r,
                 isPinned: saved != nil
@@ -97,8 +97,8 @@ final class MindMapViewModel: ObservableObject {
             ))
             for note in notes where (note.tags ?? []).contains(tag) {
                 newEdges.append(MapEdge(
-                    id: "\(note.id.uuidString)-tag:\(tag)",
-                    sourceId: note.id.uuidString,
+                    id: "\(note.id)-tag:\(tag)",
+                    sourceId: note.id,
                     targetId: "tag:\(tag)",
                     weight: 0.3,
                     isManual: false
@@ -109,9 +109,9 @@ final class MindMapViewModel: ObservableObject {
         // Relation edges
         for rel in relations where rel.score >= 0.45 {
             newEdges.append(MapEdge(
-                id: rel.id.uuidString,
-                sourceId: rel.fromId.uuidString,
-                targetId: rel.toId.uuidString,
+                id: rel.id,
+                sourceId: rel.fromId,
+                targetId: rel.toId,
                 weight: rel.score,
                 isManual: rel.manual
             ))
@@ -177,7 +177,10 @@ final class MindMapViewModel: ObservableObject {
         nodes[idx].x = x
         nodes[idx].y = y
         nodes[idx].isPinned = true
-        Task { try? await db.upsertMindmapPosition(userId: userId, nodeId: nodeId, x: x, y: y) }
+        let parts = nodeId.split(separator: ":", maxSplits: 1).map(String.init)
+        let nodeType = parts.count == 2 ? parts[0] : "note"
+        let rawNodeId = parts.count == 2 ? parts[1] : nodeId
+        Task { try? await db.upsertMindmapPosition(userId: userId, nodeType: nodeType, nodeId: rawNodeId, x: x, y: y) }
     }
 
     func unpin(nodeId: String) {

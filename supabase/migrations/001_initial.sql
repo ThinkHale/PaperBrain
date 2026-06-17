@@ -8,7 +8,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS profiles (
   id              UUID PRIMARY KEY REFERENCES auth.users ON DELETE CASCADE,
   display_name    TEXT,
-  model           TEXT    NOT NULL DEFAULT 'claude-sonnet-4-20250514',
+  model           TEXT    NOT NULL DEFAULT 'gpt-5.4-mini',
   -- Compact style guide accumulated from handwriting corrections
   -- e.g. "User's 'a' often looks like 'o'; dotted 'i' is often missed"
   handwriting_context TEXT NOT NULL DEFAULT '',
@@ -157,3 +157,61 @@ $$;
 CREATE TRIGGER notes_updated_at    BEFORE UPDATE ON notes    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 CREATE TRIGGER mindmap_updated_at  BEFORE UPDATE ON mindmap_positions FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- ── Private Storage Bucket + Policies ─────────────────────────
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'note-images',
+  'note-images',
+  false,
+  15728640,
+  ARRAY['image/jpeg', 'image/png', 'image/webp']
+)
+ON CONFLICT (id) DO UPDATE
+SET public = false,
+    file_size_limit = EXCLUDED.file_size_limit,
+    allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP POLICY IF EXISTS "Users can upload own note images" ON storage.objects;
+CREATE POLICY "Users can upload own note images"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'note-images'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "Users can view own note images" ON storage.objects;
+CREATE POLICY "Users can view own note images"
+ON storage.objects
+FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'note-images'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "Users can update own note images" ON storage.objects;
+CREATE POLICY "Users can update own note images"
+ON storage.objects
+FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'note-images'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+)
+WITH CHECK (
+  bucket_id = 'note-images'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "Users can delete own note images" ON storage.objects;
+CREATE POLICY "Users can delete own note images"
+ON storage.objects
+FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'note-images'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
