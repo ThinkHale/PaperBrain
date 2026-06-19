@@ -1,0 +1,584 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BF0000010000000000000001 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000001 /* Config.swift */; };
+		BF0000010000000000000002 /* IlluminoteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000002 /* IlluminoteApp.swift */; };
+		BF0000010000000000000003 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000003 /* Annotation.swift */; };
+		BF0000010000000000000004 /* Misc.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000004 /* Misc.swift */; };
+		BF0000010000000000000005 /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000005 /* Note.swift */; };
+		BF0000010000000000000006 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000006 /* Profile.swift */; };
+		BF0000010000000000000007 /* Relation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000007 /* Relation.swift */; };
+		BF0000010000000000000008 /* EdgeFunctionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000008 /* EdgeFunctionService.swift */; };
+		BF0000010000000000000009 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000009 /* StorageService.swift */; };
+		BF000001000000000000000A /* SupabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000000A /* SupabaseService.swift */; };
+		BF000001000000000000000B /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000000B /* AuthViewModel.swift */; };
+		BF000001000000000000000C /* MindMapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000000C /* MindMapViewModel.swift */; };
+		BF000001000000000000000D /* NoteDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000000D /* NoteDetailViewModel.swift */; };
+		BF000001000000000000000E /* NotesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000000E /* NotesViewModel.swift */; };
+		BF000001000000000000000F /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000000F /* ProfileViewModel.swift */; };
+		BF0000010000000000000010 /* UploadViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000010 /* UploadViewModel.swift */; };
+		BF0000010000000000000011 /* AnnotationCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000011 /* AnnotationCanvasView.swift */; };
+		BF0000010000000000000012 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000012 /* AuthView.swift */; };
+		BF0000010000000000000013 /* ClarificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000013 /* ClarificationView.swift */; };
+		BF0000010000000000000014 /* MarkdownView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000014 /* MarkdownView.swift */; };
+		BF0000010000000000000015 /* TagChipView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000015 /* TagChipView.swift */; };
+		BF0000010000000000000016 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000016 /* ToastView.swift */; };
+		BF0000010000000000000017 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000017 /* ContentView.swift */; };
+		BF0000010000000000000018 /* MindMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000018 /* MindMapView.swift */; };
+		BF0000010000000000000019 /* NoteDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000019 /* NoteDetailView.swift */; };
+		BF000001000000000000001A /* NoteListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000001A /* NoteListView.swift */; };
+		BF000001000000000000001B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000001B /* ProfileView.swift */; };
+		BF000001000000000000001C /* UploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000001C /* UploadView.swift */; };
+		BF000001000000000000001D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000001D /* Assets.xcassets */; };
+		BF000001000000000000001E /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = BF0000060000000000000001 /* Supabase */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		BF0000020000000000000001 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
+		BF0000020000000000000002 /* IlluminoteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IlluminoteApp.swift; sourceTree = "<group>"; };
+		BF0000020000000000000003 /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
+		BF0000020000000000000004 /* Misc.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Misc.swift; sourceTree = "<group>"; };
+		BF0000020000000000000005 /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		BF0000020000000000000006 /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
+		BF0000020000000000000007 /* Relation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Relation.swift; sourceTree = "<group>"; };
+		BF0000020000000000000008 /* EdgeFunctionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EdgeFunctionService.swift; sourceTree = "<group>"; };
+		BF0000020000000000000009 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		BF000002000000000000000A /* SupabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseService.swift; sourceTree = "<group>"; };
+		BF000002000000000000000B /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		BF000002000000000000000C /* MindMapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindMapViewModel.swift; sourceTree = "<group>"; };
+		BF000002000000000000000D /* NoteDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailViewModel.swift; sourceTree = "<group>"; };
+		BF000002000000000000000E /* NotesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesViewModel.swift; sourceTree = "<group>"; };
+		BF000002000000000000000F /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
+		BF0000020000000000000010 /* UploadViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadViewModel.swift; sourceTree = "<group>"; };
+		BF0000020000000000000011 /* AnnotationCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationCanvasView.swift; sourceTree = "<group>"; };
+		BF0000020000000000000012 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		BF0000020000000000000013 /* ClarificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClarificationView.swift; sourceTree = "<group>"; };
+		BF0000020000000000000014 /* MarkdownView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownView.swift; sourceTree = "<group>"; };
+		BF0000020000000000000015 /* TagChipView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagChipView.swift; sourceTree = "<group>"; };
+		BF0000020000000000000016 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
+		BF0000020000000000000017 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BF0000020000000000000018 /* MindMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MindMapView.swift; sourceTree = "<group>"; };
+		BF0000020000000000000019 /* NoteDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDetailView.swift; sourceTree = "<group>"; };
+		BF000002000000000000001A /* NoteListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteListView.swift; sourceTree = "<group>"; };
+		BF000002000000000000001B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		BF000002000000000000001C /* UploadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadView.swift; sourceTree = "<group>"; };
+		BF000002000000000000001D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BF000002000000000000001E /* Illuminote.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Illuminote.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BF0000030000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF000001000000000000001E /* Supabase in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BF0000040000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				BF0000040000000000000002 /* Illuminote */,
+				BF000004000000000000000A /* Products */,
+				BF000004000000000000000B /* Package Dependencies */,
+			);
+			sourceTree = "<group>";
+		};
+		BF0000040000000000000002 /* Illuminote */ = {
+			isa = PBXGroup;
+			children = (
+				BF0000020000000000000001 /* Config.swift */,
+				BF0000020000000000000002 /* IlluminoteApp.swift */,
+				BF0000040000000000000003 /* Models */,
+				BF0000040000000000000004 /* Services */,
+				BF0000040000000000000005 /* ViewModels */,
+				BF0000040000000000000006 /* Views */,
+				BF0000040000000000000009 /* Resources */,
+			);
+			path = PaperBrain;
+			sourceTree = "<group>";
+		};
+		BF0000040000000000000003 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				BF0000020000000000000003 /* Annotation.swift */,
+				BF0000020000000000000004 /* Misc.swift */,
+				BF0000020000000000000005 /* Note.swift */,
+				BF0000020000000000000006 /* Profile.swift */,
+				BF0000020000000000000007 /* Relation.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		BF0000040000000000000004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				BF0000020000000000000008 /* EdgeFunctionService.swift */,
+				BF0000020000000000000009 /* StorageService.swift */,
+				BF000002000000000000000A /* SupabaseService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		BF0000040000000000000005 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				BF000002000000000000000B /* AuthViewModel.swift */,
+				BF000002000000000000000C /* MindMapViewModel.swift */,
+				BF000002000000000000000D /* NoteDetailViewModel.swift */,
+				BF000002000000000000000E /* NotesViewModel.swift */,
+				BF000002000000000000000F /* ProfileViewModel.swift */,
+				BF0000020000000000000010 /* UploadViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		BF0000040000000000000006 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				BF0000040000000000000007 /* Annotations */,
+				BF000004000000000000000C /* Auth */,
+				BF000004000000000000000D /* Components */,
+				BF0000020000000000000017 /* ContentView.swift */,
+				BF000004000000000000000E /* MindMap */,
+				BF000004000000000000000F /* Notes */,
+				BF0000040000000000000010 /* Profile */,
+				BF0000040000000000000011 /* Upload */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BF0000040000000000000007 /* Annotations */ = {
+			isa = PBXGroup;
+			children = (
+				BF0000020000000000000011 /* AnnotationCanvasView.swift */,
+			);
+			path = Annotations;
+			sourceTree = "<group>";
+		};
+		BF0000040000000000000009 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				BF000002000000000000001D /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		BF000004000000000000000A /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BF000002000000000000001E /* Illuminote.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BF000004000000000000000B /* Package Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Package Dependencies";
+			sourceTree = "<group>";
+		};
+		BF000004000000000000000C /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				BF0000020000000000000012 /* AuthView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		BF000004000000000000000D /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				BF0000020000000000000013 /* ClarificationView.swift */,
+				BF0000020000000000000014 /* MarkdownView.swift */,
+				BF0000020000000000000015 /* TagChipView.swift */,
+				BF0000020000000000000016 /* ToastView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		BF000004000000000000000E /* MindMap */ = {
+			isa = PBXGroup;
+			children = (
+				BF0000020000000000000018 /* MindMapView.swift */,
+			);
+			path = MindMap;
+			sourceTree = "<group>";
+		};
+		BF000004000000000000000F /* Notes */ = {
+			isa = PBXGroup;
+			children = (
+				BF0000020000000000000019 /* NoteDetailView.swift */,
+				BF000002000000000000001A /* NoteListView.swift */,
+			);
+			path = Notes;
+			sourceTree = "<group>";
+		};
+		BF0000040000000000000010 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				BF000002000000000000001B /* ProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		BF0000040000000000000011 /* Upload */ = {
+			isa = PBXGroup;
+			children = (
+				BF000002000000000000001C /* UploadView.swift */,
+			);
+			path = Upload;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		PB_TARGET_APP /* Illuminote */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BF0000080000000000000002 /* Build configuration list for PBXNativeTarget "Illuminote" */;
+			buildPhases = (
+				BF00000A0000000000000001 /* Sources */,
+				BF0000030000000000000001 /* Frameworks */,
+				BF00000B0000000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Illuminote;
+			packageProductDependencies = (
+				BF0000060000000000000001 /* Supabase */,
+			);
+			productName = Illuminote;
+			productReference = BF000002000000000000001E /* Illuminote.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BF0000050000000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2650;
+				LastUpgradeCheck = 2650;
+				TargetAttributes = {
+					PB_TARGET_APP = {
+						CreatedOnToolsVersion = 26.5;
+					};
+				};
+			};
+			buildConfigurationList = BF0000080000000000000001 /* Build configuration list for PBXProject "Illuminote" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = BF0000040000000000000001;
+			packageReferences = (
+				BF0000070000000000000001 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
+			productRefGroup = BF000004000000000000000A /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				PB_TARGET_APP /* Illuminote */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BF00000B0000000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF000001000000000000001D /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BF00000A0000000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BF0000010000000000000001 /* Config.swift in Sources */,
+				BF0000010000000000000002 /* IlluminoteApp.swift in Sources */,
+				BF0000010000000000000003 /* Annotation.swift in Sources */,
+				BF0000010000000000000004 /* Misc.swift in Sources */,
+				BF0000010000000000000005 /* Note.swift in Sources */,
+				BF0000010000000000000006 /* Profile.swift in Sources */,
+				BF0000010000000000000007 /* Relation.swift in Sources */,
+				BF0000010000000000000008 /* EdgeFunctionService.swift in Sources */,
+				BF0000010000000000000009 /* StorageService.swift in Sources */,
+				BF000001000000000000000A /* SupabaseService.swift in Sources */,
+				BF000001000000000000000B /* AuthViewModel.swift in Sources */,
+				BF000001000000000000000C /* MindMapViewModel.swift in Sources */,
+				BF000001000000000000000D /* NoteDetailViewModel.swift in Sources */,
+				BF000001000000000000000E /* NotesViewModel.swift in Sources */,
+				BF000001000000000000000F /* ProfileViewModel.swift in Sources */,
+				BF0000010000000000000010 /* UploadViewModel.swift in Sources */,
+				BF0000010000000000000011 /* AnnotationCanvasView.swift in Sources */,
+				BF0000010000000000000012 /* AuthView.swift in Sources */,
+				BF0000010000000000000013 /* ClarificationView.swift in Sources */,
+				BF0000010000000000000014 /* MarkdownView.swift in Sources */,
+				BF0000010000000000000015 /* TagChipView.swift in Sources */,
+				BF0000010000000000000016 /* ToastView.swift in Sources */,
+				BF0000010000000000000017 /* ContentView.swift in Sources */,
+				BF0000010000000000000018 /* MindMapView.swift in Sources */,
+				BF0000010000000000000019 /* NoteDetailView.swift in Sources */,
+				BF000001000000000000001A /* NoteListView.swift in Sources */,
+				BF000001000000000000001B /* ProfileView.swift in Sources */,
+				BF000001000000000000001C /* UploadView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		BF0000090000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		BF0000090000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BF0000090000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Illuminote;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Illuminote uses the camera to photograph handwritten notes.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Illuminote reads photos to import handwritten notes.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.thinkhale.illuminote;
+				PRODUCT_NAME = Illuminote;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BF0000090000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Illuminote;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Illuminote uses the camera to photograph handwritten notes.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Illuminote reads photos to import handwritten notes.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.thinkhale.illuminote;
+				PRODUCT_NAME = Illuminote;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BF0000080000000000000001 /* Build configuration list for PBXProject "Illuminote" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF0000090000000000000001 /* Debug */,
+				BF0000090000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BF0000080000000000000002 /* Build configuration list for PBXNativeTarget "Illuminote" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BF0000090000000000000003 /* Debug */,
+				BF0000090000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BF0000070000000000000001 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BF0000060000000000000001 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BF0000070000000000000001 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = BF0000050000000000000001 /* Project object */;
+}

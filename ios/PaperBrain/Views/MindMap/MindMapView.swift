@@ -45,10 +45,23 @@ struct MindMapView: View {
             guard let user = authVM.currentUser else { return }
             await vm.load(userId: user.id, notes: notesVM.notes)
         }
-        .onChange(of: notesVM.notes) { _, notes in
+        .onChange(of: noteSignature) { _, _ in
             guard let user = authVM.currentUser else { return }
-            Task { await vm.load(userId: user.id, notes: notes) }
+            Task { await vm.load(userId: user.id, notes: notesVM.notes) }
         }
+    }
+
+    private var noteSignature: String {
+        notesVM.notes
+            .map { note in
+                [
+                    note.id,
+                    note.updatedAt ?? "",
+                    note.title ?? "",
+                    note.tags?.joined(separator: ",") ?? ""
+                ].joined(separator: "|")
+            }
+            .joined(separator: "||")
     }
 
     // MARK: - Graph canvas
@@ -100,14 +113,14 @@ struct MindMapView: View {
                 case .note:
                     let r: CGFloat = isSelected ? 28 : 22
                     let rect = CGRect(x: pt.x - r, y: pt.y - r, width: r * 2, height: r * 2)
-                    ctx.fill(Path(ellipseIn: rect), with: .color(isSelected ? .tint : .blue.opacity(0.7)))
+                    ctx.fill(Path(ellipseIn: rect), with: .color(isSelected ? Color.accentColor : .blue.opacity(0.7)))
                     ctx.stroke(Path(ellipseIn: rect), with: .color(.white.opacity(0.6)),
                                style: StrokeStyle(lineWidth: node.isPinned ? 2.5 : 1))
 
                 case .tag:
                     let r: CGFloat = isSelected ? 18 : 14
                     let hexPath = hexagonPath(center: pt, radius: r)
-                    ctx.fill(hexPath, with: .color(isSelected ? .tint : .purple.opacity(0.6)))
+                    ctx.fill(hexPath, with: .color(isSelected ? Color.accentColor : .purple.opacity(0.6)))
                     ctx.stroke(hexPath, with: .color(.white.opacity(0.5)),
                                style: StrokeStyle(lineWidth: 1))
                 }

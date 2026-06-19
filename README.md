@@ -1,6 +1,8 @@
-# PaperBrain
+# Illuminote
 
-Upload photos or PDFs of handwritten notes, and let OpenAI transcribe, organize, and connect them — all synced across your devices.
+Your thoughts. Intelligently connected.
+
+Upload photos or PDFs of handwritten notes, and let OpenAI transcribe, organize, and connect them across your devices.
 
 ## Features
 
@@ -57,7 +59,7 @@ supabase functions deploy learn-handwriting
 Edit `config.js` with your project details:
 
 ```js
-window.PAPERBRAIN_CONFIG = {
+window.ILLUMINOTE_CONFIG = {
   supabaseUrl:     "https://your-project.supabase.co",
   supabaseAnonKey: "eyJ...",
 };

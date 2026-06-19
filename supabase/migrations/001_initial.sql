@@ -1,4 +1,4 @@
--- PaperBrain Database Schema
+-- Illuminote Database Schema
 -- Run with: supabase db push  (or supabase migration up)
 
 -- ── Extensions ────────────────────────────────────────────────
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS annotations (
   shape_data  JSONB NOT NULL,
   tag         TEXT,                               -- associated tag label
   label       TEXT,                               -- optional display label
-  color       TEXT NOT NULL DEFAULT '#6366f1',    -- hex color
+  color       TEXT NOT NULL DEFAULT '#FFC857',    -- hex color
   -- AI-extracted content for this region (filled after region re-process)
   region_content TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()

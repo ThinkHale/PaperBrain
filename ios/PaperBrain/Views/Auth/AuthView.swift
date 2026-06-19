@@ -13,12 +13,12 @@ struct AuthView: View {
 
                 // Branding
                 VStack(spacing: 8) {
-                    Image(systemName: "brain.head.profile")
-                        .font(.system(size: 64))
-                        .foregroundStyle(.tint)
-                    Text("PaperBrain")
-                        .font(.largeTitle.bold())
-                    Text("Your handwritten notes, made searchable")
+                    Image("IlluminoteLogo")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: 240)
+                        .accessibilityLabel("Illuminote")
+                    Text("Your thoughts. Intelligently connected.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)

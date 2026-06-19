@@ -126,7 +126,7 @@ Return:
         text: {
           format: {
             type: "json_schema",
-            name: mode === "region" ? "paperbrain_region" : "paperbrain_note",
+            name: mode === "region" ? "illuminote_region" : "illuminote_note",
             strict: true,
             schema,
           },

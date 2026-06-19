@@ -1,5 +1,5 @@
 /**
- * auth.js — Supabase Auth wrapper for PaperBrain
+ * auth.js — Supabase Auth wrapper for Illuminote
  *
  * Exposes:
  *   Auth.init()             → set up session listener, returns initial session
@@ -14,7 +14,7 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const { supabaseUrl, supabaseAnonKey } = window.PAPERBRAIN_CONFIG ?? {};
+const { supabaseUrl, supabaseAnonKey } = window.ILLUMINOTE_CONFIG ?? {};
 
 function hasValidConfig(url, key) {
   if (!url || !key) return false;
@@ -34,7 +34,7 @@ export const configError =
 
 if (!isConfigured) {
   console.warn(
-    "[PaperBrain] " + configError,
+    "[Illuminote] " + configError,
   );
 }
 

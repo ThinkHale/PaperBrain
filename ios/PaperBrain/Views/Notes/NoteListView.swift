@@ -83,7 +83,7 @@ struct NoteListView: View {
         Menu {
             ShareLink(
                 item: notesExportData,
-                preview: SharePreview("PaperBrain Export", image: Image(systemName: "square.and.arrow.up"))
+                preview: SharePreview("Illuminote Export", image: Image(systemName: "square.and.arrow.up"))
             ) {
                 Label("Export All (JSON)", systemImage: "arrow.down.doc")
             }

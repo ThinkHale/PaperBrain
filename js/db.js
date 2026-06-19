@@ -1,5 +1,5 @@
 /**
- * db.js — Supabase data layer for PaperBrain
+ * db.js — Supabase data layer for Illuminote
  *
  * All functions require Auth.getToken() to be non-null (user signed in).
  * The Supabase client enforces RLS: users only see their own rows.

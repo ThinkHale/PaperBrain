@@ -1,11 +1,11 @@
 /**
- * annotate.js — Canvas annotation engine for PaperBrain
+ * annotate.js — Canvas annotation engine for Illuminote
  *
  * Usage:
  *   const engine = new AnnotationEngine(canvasEl, imageEl, { onSave, onDelete });
  *   engine.setTool('rect' | 'ellipse' | 'freehand');
  *   engine.setTag('equations');
- *   engine.setColor('#6366f1');
+ *   engine.setColor('#FFC857');
  *   engine.loadAnnotations(rows);   // from Supabase
  *   engine.destroy();
  *
@@ -14,7 +14,7 @@
  */
 
 const TAG_COLORS = [
-  "#6366f1", "#ec4899", "#f59e0b", "#10b981",
+  "#FFC857", "#5B6472", "#E6E8EF", "#10b981",
   "#3b82f6", "#ef4444", "#8b5cf6", "#14b8a6",
 ];
 
@@ -310,7 +310,7 @@ export class AnnotationEngine {
 
   _drawShape(ctx, ann, selected, alpha = 1) {
     const d = ann.shape_data;
-    const color = ann.color ?? "#6366f1";
+    const color = ann.color ?? "#FFC857";
     const W = this.canvas.width;
     const H = this.canvas.height;
 

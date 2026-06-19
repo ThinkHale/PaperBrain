@@ -20,14 +20,20 @@ struct ContentView: View {
 
     private var splashScreen: some View {
         VStack(spacing: 16) {
-            Image(systemName: "brain.head.profile")
-                .font(.system(size: 60))
-                .foregroundStyle(.tint)
-            Text("PaperBrain")
+            Image("IlluminoteMark")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 96, height: 96)
+            Text("Illuminote")
                 .font(.largeTitle.bold())
+            Text("Your thoughts. Intelligently connected.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             ProgressView()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(red: 0.05, green: 0.11, blue: 0.16))
+        .foregroundStyle(.white)
     }
 }
 

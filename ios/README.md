@@ -1,10 +1,10 @@
-# PaperBrain iOS
+# Illuminote iOS
 
-Native SwiftUI iOS app for PaperBrain — AI-powered handwritten notes.
+Native SwiftUI iOS app for Illuminote — AI-powered handwritten notes.
 
 ## Requirements
 
-- Xcode 16+
+- Xcode 16+ (verified with Xcode 26.5)
 - iOS 17+ deployment target
 - Swift 5.10+
 - An active Supabase project (shared with the web app)
@@ -13,57 +13,36 @@ Native SwiftUI iOS app for PaperBrain — AI-powered handwritten notes.
 
 ## Setup
 
-### 1. Create the Xcode project
+### 1. Open the Xcode project
 
-1. Open Xcode → **File → New → Project**
-2. Choose **iOS → App**
-3. Set:
-   - **Product Name:** `PaperBrain`
-   - **Bundle Identifier:** `com.yourname.paperbrain`
-   - **Interface:** SwiftUI
-   - **Language:** Swift
-   - **Minimum Deployment:** iOS 17.0
-4. Save it **inside** the `ios/` folder of this repo
+Open `ios/PaperBrain.xcodeproj` and select the shared `Illuminote` scheme.
 
-### 2. Add all Swift source files
+The project already includes:
 
-Drag the entire `ios/PaperBrain/` folder into the Xcode project navigator (choose **"Add files to PaperBrain"**, tick **"Copy items if needed"** = OFF, **"Create groups"** = ON).
+- All Swift source files under `ios/PaperBrain/`
+- Supabase Swift SDK via Swift Package Manager
+- Generated Info.plist settings
+- Camera and photo library usage descriptions
+- App icon assets under `Resources/Assets.xcassets`
+- A shared scheme for Xcode Cloud
 
-Make sure these groups are present in the project:
-```
-PaperBrain/
-├── Config.swift
-├── PaperBrainApp.swift
-├── Models/
-├── Services/
-├── ViewModels/
-└── Views/
-    ├── Auth/
-    ├── Notes/
-    ├── Upload/
-    ├── Annotations/
-    ├── MindMap/
-    ├── Profile/
-    └── Components/
-```
+### 2. Configure signing
 
-### 3. Add the Supabase Swift SDK
+Before archiving or connecting Xcode Cloud, open the `Illuminote` target and update:
 
-1. **File → Add Package Dependencies…**
-2. Enter: `https://github.com/supabase/supabase-swift.git`
-3. Version rule: **Up to Next Major → 2.0.0**
-4. Add product: **Supabase** → target: **PaperBrain**
+- **Team:** your Apple Developer team
+- **Bundle Identifier:** currently `com.thinkhale.illuminote`
 
-### 4. Configure Info.plist permissions
+### 3. Info.plist permissions
 
-Open `Info.plist` (or the target's **Info** tab) and add these keys:
+The generated target Info settings include:
 
 | Key | Value |
 |-----|-------|
-| `NSCameraUsageDescription` | `PaperBrain uses the camera to photograph handwritten notes.` |
-| `NSPhotoLibraryUsageDescription` | `PaperBrain reads photos to import handwritten notes.` |
+| `NSCameraUsageDescription` | `Illuminote uses the camera to photograph handwritten notes.` |
+| `NSPhotoLibraryUsageDescription` | `Illuminote reads photos to import handwritten notes.` |
 
-### 5. Verify Supabase credentials
+### 4. Verify Supabase credentials
 
 Open `Config.swift` and confirm the URL and anon key match your Supabase project:
 
@@ -74,9 +53,30 @@ enum Config {
 }
 ```
 
-### 6. Build & run
+### 5. Build & run
 
 Select an iPhone simulator (or physical device) and press **⌘R**.
+
+Command-line verification:
+
+```sh
+xcodebuild build \
+  -project ios/PaperBrain.xcodeproj \
+  -scheme Illuminote \
+  -destination 'generic/platform=iOS Simulator' \
+  -configuration Debug \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+### 6. Xcode Cloud
+
+In App Store Connect, create a workflow using:
+
+- **Project:** `ios/PaperBrain.xcodeproj`
+- **Scheme:** `Illuminote`
+- **Archive action:** Release
+
+Make sure signing is configured for the bundle identifier before the first cloud archive.
 
 ---
 
@@ -106,14 +106,15 @@ All AI processing still happens **server-side** in the existing Supabase Edge Fu
 ```
 ios/PaperBrain/
 ├── Config.swift               — Supabase URL + anon key
-├── PaperBrainApp.swift        — @main entry, injects environment objects
+├── IlluminoteApp.swift        — @main entry, injects environment objects
 ├── Models/
 │   ├── Note.swift
-│   ├── NoteImage.swift
 │   ├── Annotation.swift
 │   ├── Relation.swift
 │   ├── Profile.swift
 │   └── Misc.swift             — MindmapPosition, HandwritingCorrection
+├── Resources/
+│   └── Assets.xcassets
 ├── Services/
 │   ├── SupabaseService.swift  — Supabase Swift SDK client + all DB CRUD
 │   ├── StorageService.swift   — Image upload/download + resize/crop helpers

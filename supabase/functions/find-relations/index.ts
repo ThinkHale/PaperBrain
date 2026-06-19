@@ -95,7 +95,7 @@ The id must exactly match one of the existing note IDs.`;
         text: {
           format: {
             type: "json_schema",
-            name: "paperbrain_relations",
+            name: "illuminote_relations",
             strict: true,
             schema: relationSchema(),
           },

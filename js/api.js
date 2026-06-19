@@ -1,5 +1,5 @@
 /**
- * api.js — Supabase Edge Function client for PaperBrain
+ * api.js — Supabase Edge Function client for Illuminote
  *
  * All requests go to Supabase Edge Functions (server-side OpenAI calls).
  * No API key is needed on the client — the key lives in the Edge Function secret.
@@ -7,7 +7,7 @@
 
 import { client, getToken } from "./auth.js";
 
-const { supabaseUrl, supabaseAnonKey } = window.PAPERBRAIN_CONFIG ?? {};
+const { supabaseUrl, supabaseAnonKey } = window.ILLUMINOTE_CONFIG ?? {};
 
 async function callFn(name, body) {
   const token = getToken() ?? (await client.auth.getSession()).data.session?.access_token;

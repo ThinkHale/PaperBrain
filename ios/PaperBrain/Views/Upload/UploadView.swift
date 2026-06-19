@@ -32,7 +32,9 @@ struct UploadView: View {
             .fileImporter(isPresented: $showDocumentPicker,
                           allowedContentTypes: [.pdf],
                           allowsMultipleSelection: false) { result in
-                if case .success(let url) = result, url.startAccessingSecurityScopedResource() {
+                if case .success(let urls) = result,
+                   let url = urls.first,
+                   url.startAccessingSecurityScopedResource() {
                     defer { url.stopAccessingSecurityScopedResource() }
                     if let data = try? Data(contentsOf: url) {
                         vm.addPDF(data: data)
@@ -213,6 +215,3 @@ struct UploadView: View {
         }
     }
 }
-
-// Make Note Identifiable for .sheet(item:)
-extension Note: @retroactive Identifiable {}

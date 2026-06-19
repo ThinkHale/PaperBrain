@@ -55,7 +55,7 @@ struct AnnotationCanvasView: View {
             .alert("Tag this region", isPresented: $showTagPrompt) {
                 TextField("e.g. formula, diagram, todo", text: $tagInput)
                     .autocapitalization(.none)
-                Button("Save") { saveAnnotation() }
+                Button("Save") { saveAnnotation(withTag: tagInput.isEmpty ? nil : tagInput) }
                 Button("Skip") { saveAnnotation(withTag: nil) }
                 Button("Cancel", role: .cancel) {
                     pendingShape = nil
@@ -79,7 +79,7 @@ struct AnnotationCanvasView: View {
                         Text(tool.displayName)
                             .font(.caption2)
                     }
-                    .foregroundStyle(selectedTool == tool ? .tint : .secondary)
+                    .foregroundStyle(selectedTool == tool ? Color.accentColor : Color.secondary)
                     .padding(10)
                     .background(selectedTool == tool ? Color.accentColor.opacity(0.15) : .clear,
                                 in: RoundedRectangle(cornerRadius: 8))
@@ -94,7 +94,7 @@ struct AnnotationCanvasView: View {
 
     // MARK: - Save
 
-    private func saveAnnotation(withTag tag: String? = tagInput.isEmpty ? nil : tagInput) {
+    private func saveAnnotation(withTag tag: String?) {
         defer {
             pendingShape = nil
             tagInput = ""

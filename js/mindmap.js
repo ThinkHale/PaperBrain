@@ -1,5 +1,5 @@
 /**
- * mindmap.js — D3 force-directed mind map for PaperBrain
+ * mindmap.js — D3 force-directed mind map for Illuminote
  *
  * Usage:
  *   const map = new MindMap('#mindmap-svg', { onOpenNote, onSavePosition, onSaveRelation });
@@ -23,7 +23,7 @@
 const NOTE_R = 28;
 const TAG_R  = 36;
 const TAG_COLORS = [
-  "#6366f1","#ec4899","#f59e0b","#10b981",
+  "#FFC857","#5B6472","#E6E8EF","#10b981",
   "#3b82f6","#ef4444","#8b5cf6","#14b8a6",
   "#f97316","#06b6d4","#84cc16","#a855f7",
 ];

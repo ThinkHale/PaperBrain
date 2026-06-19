@@ -1,5 +1,5 @@
 /**
- * app.js — PaperBrain main application
+ * app.js — Illuminote main application
  *
  * Coordinates: Auth → DB → API → UI
  */
@@ -307,7 +307,7 @@ saveProfileBtn?.addEventListener("click", async () => {
 exportAllBtn?.addEventListener("click", async () => {
   const data = await DB.exportAll();
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
-  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: `paperbrain-${Date.now()}.json` });
+  const a = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: `illuminote-${Date.now()}.json` });
   a.click();
 });
 
