@@ -16,7 +16,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "PB_TARGET_APP"
-               BuildableName = "Illuminote.app"
+               BuildableName = "Illuminotes.app"
                BlueprintName = "Illuminote"
                ReferencedContainer = "container:PaperBrain.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "PB_TARGET_APP"
-            BuildableName = "Illuminote.app"
+            BuildableName = "Illuminotes.app"
             BlueprintName = "Illuminote"
             ReferencedContainer = "container:PaperBrain.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "PB_TARGET_APP"
-            BuildableName = "Illuminote.app"
+            BuildableName = "Illuminotes.app"
             BlueprintName = "Illuminote"
             ReferencedContainer = "container:PaperBrain.xcodeproj">
          </BuildableReference>
