@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(deno --version)",
+      "Bash(echo \"=== Package.resolved supabase ===\" && grep -A4 -i \"supabase\" ios/PaperBrain.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved | head -30 *)",
+      "Read(//Users/Cody.Hale/Library/Developer/Xcode/DerivedData/**)",
+      "Read(//Users/Cody.Hale/Library/Caches/org.swift.swiftpm/**)",
+      "Bash(gem list *)",
+      "Bash(python3 -c \"import pbxproj; print\\('pbxproj', pbxproj.__version__\\)\")",
+      "Bash(ruby --version)",
+      "Bash(ruby -e ' *)",
+      "Bash(ruby /private/tmp/claude-501/-Users-Cody-Hale-ThinkHale-PaperBrain/45bf90b8-d037-4c6a-a47b-f2de09cd7a90/scratchpad/wire_project.rb)",
+      "Bash(supabase --version)"
+    ],
+    "additionalDirectories": [
+      "/private/tmp/claude-501/-Users-Cody-Hale-ThinkHale-PaperBrain/45bf90b8-d037-4c6a-a47b-f2de09cd7a90/scratchpad"
+    ]
+  }
+}

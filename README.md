@@ -36,9 +36,10 @@ Or, in the Supabase Dashboard → **SQL Editor**, run the migration files in ord
 ```
 supabase/migrations/001_initial.sql
 supabase/migrations/002_fix_profile_model_defaults.sql
+supabase/migrations/003_v1_1.sql
 ```
 
-This creates all tables, RLS policies, triggers, the private `note-images` Storage bucket, and Storage policies.
+This creates all tables, RLS policies, triggers, the private `note-images` and `note-assets` Storage buckets, and Storage policies. Migration `003` adds note categories, note types, unclear-word regions, the tag vocabulary, the To-Do list, voice/drawing asset columns, and usage metering.
 
 ### 3 — Deploy the Edge Functions
 
@@ -48,11 +49,14 @@ Install the [Supabase CLI](https://supabase.com/docs/guides/cli) if you haven't,
 # Set your OpenAI API key as a secret
 supabase secrets set OPENAI_API_KEY=sk-...
 
-# Deploy all three functions
+# Deploy all functions
 supabase functions deploy process-note
 supabase functions deploy find-relations
 supabase functions deploy learn-handwriting
+supabase functions deploy transcribe-audio
 ```
+
+> **Important:** apply migration `003_v1_1.sql` *before* deploying the updated `process-note` function — it writes to the new note columns and tables.
 
 ### 4 — Configure the frontend
 

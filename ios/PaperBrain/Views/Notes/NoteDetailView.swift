@@ -4,11 +4,14 @@ struct NoteDetailView: View {
     @EnvironmentObject private var authVM: AuthViewModel
     @EnvironmentObject private var notesVM: NotesViewModel
     @EnvironmentObject private var toastVM: ToastViewModel
+    @EnvironmentObject private var tagsVM: TagsViewModel
     @StateObject private var vm: NoteDetailViewModel
     @State private var selectedTab = 0
     @State private var showAnnotationCanvas = false
+    @State private var showSplitCanvas = false
     @State private var annotationImageIndex = 0
     @State private var showAddTag = false
+    @State private var showAddCategory = false
     @State private var newTagText = ""
     @State private var lightboxImage: UIImage?
     @Environment(\.dismiss) private var dismiss
@@ -23,6 +26,10 @@ struct NoteDetailView: View {
                 titleSection
                 tagsSection
                 imageStrip
+                if let audioPath = vm.note.audioPath, !audioPath.isEmpty {
+                    AudioPlayerView(storagePath: audioPath)
+                }
+                if !vm.noteTodos.isEmpty { todosSection }
                 tabSection
                 if !vm.relations.isEmpty { relationsSection }
             }
@@ -52,6 +59,23 @@ struct NoteDetailView: View {
                 }
             }
         }
+        .sheet(isPresented: $showSplitCanvas) {
+            if !vm.images.isEmpty,
+               let img = vm.imageCache[vm.images[annotationImageIndex].id] {
+                SplitCanvasView(image: img, isProcessing: vm.isSplitting) { rects in
+                    guard let user = authVM.currentUser else { return }
+                    Task {
+                        let created = await vm.splitIntoNotes(rects: rects, sourceImage: img, userId: user.id)
+                        for note in created { notesVM.prepend(note) }
+                        await vm.loadAll()   // refresh relations to the new notes
+                        showSplitCanvas = false
+                        if !created.isEmpty {
+                            toastVM.show("Created \(created.count) note\(created.count == 1 ? "" : "s")", style: .success)
+                        }
+                    }
+                }
+            }
+        }
         .overlay {
             if let img = lightboxImage {
                 lightbox(img)
@@ -78,24 +102,9 @@ struct NoteDetailView: View {
     }
 
     private var tagsSection: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(vm.note.tags ?? [], id: \.self) { tag in
-                    TagChip(tag: tag, deletable: vm.isEditing) {
-                        Task { await vm.removeTag(tag) }
-                    }
-                }
-                if vm.isEditing {
-                    Button {
-                        showAddTag = true
-                    } label: {
-                        Label("Add tag", systemImage: "plus")
-                            .font(.caption)
-                    }
-                    .buttonStyle(.bordered)
-                    .controlSize(.mini)
-                }
-            }
+        VStack(alignment: .leading, spacing: 8) {
+            categoryRow
+            topicRow
         }
         .alert("Add tag", isPresented: $showAddTag) {
             TextField("Tag name", text: $newTagText)
@@ -108,6 +117,68 @@ struct NoteDetailView: View {
             }
             Button("Cancel", role: .cancel) { newTagText = "" }
         }
+        .alert("Add category", isPresented: $showAddCategory) {
+            TextField("Category name", text: $newTagText)
+            Button("Add") {
+                Task {
+                    await vm.addCategory(newTagText)
+                    await tagsVM.add(name: newTagText, kind: .category)
+                    newTagText = ""
+                }
+            }
+            Button("Cancel", role: .cancel) { newTagText = "" }
+        }
+    }
+
+    private var categoryRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(vm.note.categories ?? [], id: \.self) { cat in
+                    CategoryChip(name: cat,
+                                 color: Color(hex: tagsVM.color(forCategory: cat) ?? "") ?? .accentColor,
+                                 deletable: vm.isEditing) {
+                        Task { await vm.removeCategory(cat) }
+                    }
+                }
+                if vm.isEditing {
+                    // Suggest curated categories the note doesn't have yet.
+                    ForEach(suggestedCategories, id: \.self) { cat in
+                        SuggestionChip(text: cat, icon: "square.stack.3d.up") {
+                            Task { await vm.addCategory(cat) }
+                        }
+                    }
+                    Button { showAddCategory = true } label: {
+                        Label("New", systemImage: "plus").font(.caption)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.mini)
+                }
+            }
+        }
+    }
+
+    private var topicRow: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(vm.note.tags ?? [], id: \.self) { tag in
+                    TagChip(tag: tag, deletable: vm.isEditing) {
+                        Task { await vm.removeTag(tag) }
+                    }
+                }
+                if vm.isEditing {
+                    Button { showAddTag = true } label: {
+                        Label("Tag", systemImage: "plus").font(.caption)
+                    }
+                    .buttonStyle(.bordered)
+                    .controlSize(.mini)
+                }
+            }
+        }
+    }
+
+    private var suggestedCategories: [String] {
+        let current = Set((vm.note.categories ?? []).map { $0.lowercased() })
+        return tagsVM.categoryNames.filter { !current.contains($0.lowercased()) }.prefix(4).map { $0 }
     }
 
     private var imageStrip: some View {
@@ -146,10 +217,14 @@ struct NoteDetailView: View {
                                 }
                             }
                             .contextMenu {
-                                Button("Annotate") {
+                                Button {
                                     annotationImageIndex = idx
                                     showAnnotationCanvas = true
-                                }
+                                } label: { Label("Annotate", systemImage: "pencil.tip.crop.circle") }
+                                Button {
+                                    annotationImageIndex = idx
+                                    showSplitCanvas = true
+                                } label: { Label("Split into notes", systemImage: "rectangle.split.2x1") }
                             }
                         }
                     }
@@ -217,6 +292,32 @@ struct NoteDetailView: View {
                 Text("No key points").foregroundStyle(.secondary)
             }
         }
+    }
+
+    private var todosSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("To-Dos", systemImage: "checklist")
+                .font(.headline)
+            ForEach(vm.noteTodos) { todo in
+                Button {
+                    Task { await vm.toggleNoteTodo(todo) }
+                } label: {
+                    HStack(alignment: .top, spacing: 10) {
+                        Image(systemName: todo.done ? "checkmark.circle.fill" : "circle")
+                            .foregroundStyle(todo.done ? Color.accentColor : .secondary)
+                        Text(todo.text)
+                            .strikethrough(todo.done)
+                            .foregroundStyle(todo.done ? .secondary : .primary)
+                            .multilineTextAlignment(.leading)
+                        Spacer()
+                    }
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.quaternary.opacity(0.4), in: RoundedRectangle(cornerRadius: 12))
     }
 
     private var relationsSection: some View {

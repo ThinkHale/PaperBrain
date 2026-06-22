@@ -41,28 +41,70 @@ struct ContentView: View {
 
 struct MainTabView: View {
     @EnvironmentObject private var authVM: AuthViewModel
+    @EnvironmentObject private var toastVM: ToastViewModel
     @StateObject private var notesVM = NotesViewModel()
+    @StateObject private var todosVM = TodosViewModel()
+    @StateObject private var tagsVM = TagsViewModel()
+
+    @State private var selection = 0
+    @State private var previousSelection = 0
+    @State private var showCapture = false
+
+    private let captureTag = 2
 
     var body: some View {
-        TabView {
+        TabView(selection: $selection) {
             NoteListView()
                 .environmentObject(notesVM)
+                .environmentObject(tagsVM)
                 .tabItem { Label("Notes", systemImage: "note.text") }
+                .tag(0)
 
-            UploadView()
+            TodoListView()
+                .environmentObject(todosVM)
                 .environmentObject(notesVM)
-                .tabItem { Label("Scan", systemImage: "camera.viewfinder") }
+                .environmentObject(tagsVM)
+                .tabItem { Label("To-Do", systemImage: "checklist") }
+                .badge(todosVM.openCount)
+                .tag(1)
+
+            // Center capture button — selecting it opens the hub sheet, not a tab.
+            Color.clear
+                .tabItem { Label("Capture", systemImage: "plus.circle.fill") }
+                .tag(captureTag)
 
             MindMapView()
                 .environmentObject(notesVM)
+                .environmentObject(tagsVM)
                 .tabItem { Label("Map", systemImage: "circle.hexagongrid") }
+                .tag(3)
 
             ProfileView()
+                .environmentObject(tagsVM)
                 .tabItem { Label("Profile", systemImage: "person.circle") }
+                .tag(4)
+        }
+        .onChange(of: selection) { _, newValue in
+            if newValue == captureTag {
+                showCapture = true
+                selection = previousSelection
+            } else {
+                previousSelection = newValue
+            }
+        }
+        .sheet(isPresented: $showCapture) {
+            CaptureHubView()
+                .environmentObject(authVM)
+                .environmentObject(toastVM)
+                .environmentObject(notesVM)
+                .environmentObject(todosVM)
+                .environmentObject(tagsVM)
         }
         .task {
             guard let user = authVM.currentUser else { return }
             await notesVM.fetchNotes(userId: user.id)
+            await todosVM.load(userId: user.id)
+            await tagsVM.load(userId: user.id)
         }
     }
 }

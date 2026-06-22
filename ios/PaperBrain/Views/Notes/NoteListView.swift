@@ -66,7 +66,7 @@ struct NoteListView: View {
             if notesVM.searchQuery.isEmpty {
                 Text("No notes yet")
                     .font(.title3.bold())
-                Text("Tap **Scan** to upload your first handwritten note")
+                Text("Tap the **+** tab to type, draw, scan, or record your first note")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -102,9 +102,16 @@ struct NoteListView: View {
 struct NoteRowView: View {
     let note: Note
 
+    private var hasChips: Bool {
+        !(note.categories ?? []).isEmpty || !(note.tags ?? []).isEmpty
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            HStack {
+            HStack(spacing: 6) {
+                Image(systemName: note.noteTypeValue.iconName)
+                    .font(.caption)
+                    .foregroundStyle(.tint)
                 Text(note.displayTitle)
                     .font(.headline)
                     .lineLimit(1)
@@ -126,10 +133,13 @@ struct NoteRowView: View {
                     .lineLimit(2)
             }
 
-            if let tags = note.tags, !tags.isEmpty {
+            if hasChips {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        ForEach(tags, id: \.self) { tag in
+                        ForEach(note.categories ?? [], id: \.self) { cat in
+                            CategoryChip(name: cat)
+                        }
+                        ForEach(note.tags ?? [], id: \.self) { tag in
                             TagChip(tag: tag)
                         }
                     }

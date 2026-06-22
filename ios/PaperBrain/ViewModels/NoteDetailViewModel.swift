@@ -10,8 +10,10 @@ final class NoteDetailViewModel: ObservableObject {
     @Published var annotations: [Annotation] = []
     @Published var relations: [Relation] = []
     @Published var relatedNotes: [String: Note] = [:]
+    @Published var noteTodos: [Todo] = []
     @Published var isLoading = false
     @Published var isSaving = false
+    @Published var isSplitting = false
     @Published var error: String?
 
     // Editing state
@@ -29,7 +31,7 @@ final class NoteDetailViewModel: ObservableObject {
 
     struct UnclearWord: Identifiable {
         let id = UUID()
-        let word: String
+        let word: String            // the AI's best guess (or "[unclear]")
         let contextSnippet: String
         var correction: String = ""
         var croppedImage: UIImage?
@@ -46,12 +48,14 @@ final class NoteDetailViewModel: ObservableObject {
         async let imgsTask = db.fetchNoteImages(noteId: note.id)
         async let annsTask = db.fetchAnnotations(noteId: note.id)
         async let relsTask = db.fetchRelations(noteId: note.id)
+        async let todosTask = db.fetchTodos(noteId: note.id)
 
         do {
-            let (imgs, anns, rels) = try await (imgsTask, annsTask, relsTask)
+            let (imgs, anns, rels, todos) = try await (imgsTask, annsTask, relsTask, todosTask)
             images = imgs
             annotations = anns
             relations = rels
+            noteTodos = todos
             await loadRelatedNoteTitles(relations: rels)
             await downloadImages(imgs)
         } catch {
@@ -136,6 +140,31 @@ final class NoteDetailViewModel: ObservableObject {
         }
     }
 
+    func addCategory(_ category: String) async {
+        let trimmed = category.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty,
+              !(note.categories?.contains { $0.caseInsensitiveCompare(trimmed) == .orderedSame } ?? false) else { return }
+        var categories = note.categories ?? []
+        categories.append(trimmed)
+        do {
+            try await db.updateNoteCategories(noteId: note.id, categories: categories)
+            note.categories = categories
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
+    func removeCategory(_ category: String) async {
+        var categories = note.categories ?? []
+        categories.removeAll { $0 == category }
+        do {
+            try await db.updateNoteCategories(noteId: note.id, categories: categories)
+            note.categories = categories
+        } catch {
+            self.error = error.localizedDescription
+        }
+    }
+
     // MARK: - Annotations
 
     func addAnnotation(_ annotation: Annotation) async {
@@ -182,9 +211,65 @@ final class NoteDetailViewModel: ObservableObject {
         }
     }
 
+    // MARK: - To-dos
+
+    func toggleNoteTodo(_ todo: Todo) async {
+        guard let idx = noteTodos.firstIndex(of: todo) else { return }
+        let newValue = !noteTodos[idx].done
+        noteTodos[idx].done = newValue
+        do {
+            try await db.setTodoDone(id: todo.id, done: newValue)
+        } catch {
+            noteTodos[idx].done = !newValue
+            self.error = error.localizedDescription
+        }
+    }
+
+    // MARK: - Note separation
+
+    /// Crop each region from the page and turn it into its own note, linked back
+    /// to this note. Returns the newly created notes.
+    func splitIntoNotes(rects: [CGRect], sourceImage: UIImage, userId: UUID) async -> [Note] {
+        guard !rects.isEmpty else { return [] }
+        isSplitting = true
+        defer { isSplitting = false }
+
+        var created: [Note] = []
+        for rect in rects {
+            guard let cropped = StorageService.cropImage(sourceImage, normalizedRect: rect),
+                  let dataURL = StorageService.toDataURL(StorageService.resize(cropped)) else { continue }
+            do {
+                let newNote = try await edgeFunctions.processNote(images: [dataURL])
+                try? await db.insertManualRelation(fromId: note.id, toId: newNote.id, userId: userId)
+                edgeFunctions.findRelations(noteId: newNote.id)
+                created.append(newNote)
+            } catch {
+                self.error = error.localizedDescription
+            }
+        }
+        return created
+    }
+
     // MARK: - Unclear words
 
     private func checkForUnclearWords() {
+        // Preferred path: the AI returned located regions, so we can show a crop.
+        if let regions = note.unclearRegions, !regions.isEmpty {
+            unclearWords = regions.map { region in
+                let guess = region.guess?.trimmingCharacters(in: .whitespaces) ?? ""
+                let context = region.context?.trimmingCharacters(in: .whitespaces) ?? ""
+                return UnclearWord(
+                    word: guess.isEmpty ? "[unclear]" : guess,
+                    contextSnippet: context.isEmpty ? "(no surrounding context)" : context,
+                    correction: guess,   // prefill the guess; user confirms or fixes it
+                    croppedImage: croppedImage(for: region)
+                )
+            }
+            showClarification = !unclearWords.isEmpty
+            return
+        }
+
+        // Fallback for notes processed before bounding boxes existed.
         guard let transcription = note.transcription else { return }
         let snippets = transcription.components(separatedBy: .newlines)
         unclearWords = snippets.compactMap { line in
@@ -194,8 +279,27 @@ final class NoteDetailViewModel: ObservableObject {
         showClarification = !unclearWords.isEmpty
     }
 
+    /// Crop the page image to an unclear word's bounding box (padded for legibility).
+    private func croppedImage(for region: UnclearRegion) -> UIImage? {
+        guard let x = region.x, let y = region.y, let w = region.w, let h = region.h,
+              w > 0, h > 0 else { return nil }
+        let page = region.page ?? 0
+        guard let noteImage = images.first(where: { ($0.pageNumber ?? 0) == page }) ?? images.first,
+              let source = imageCache[noteImage.id] else { return nil }
+
+        // Pad the box by ~8% of its size (min 2% of the page) so the word is readable.
+        let padX = max(w * 0.18, 0.02)
+        let padY = max(h * 0.5, 0.02)
+        let rect = CGRect(x: x - padX, y: y - padY, width: w + padX * 2, height: h + padY * 2)
+        return StorageService.cropImage(source, normalizedRect: rect)
+    }
+
     func submitClarifications(userId: UUID) async {
-        let filledIn = unclearWords.filter { !$0.correction.isEmpty }
+        // Only learn from words the user actually changed away from the AI's guess.
+        let filledIn = unclearWords.filter {
+            let corrected = $0.correction.trimmingCharacters(in: .whitespaces)
+            return !corrected.isEmpty && corrected != $0.word
+        }
         guard !filledIn.isEmpty else {
             showClarification = false
             return
@@ -203,8 +307,8 @@ final class NoteDetailViewModel: ObservableObject {
         for item in filledIn {
             let correction = HandwritingCorrection(
                 userId: userId,
-                original: item.word,
-                correction: item.correction,
+                original: item.word,                // AI's guess
+                correction: item.correction,        // what it actually said
                 contextSnippet: item.contextSnippet,
                 noteId: note.id
             )

@@ -13,6 +13,7 @@ struct MapNode: Identifiable {
     let kind: Kind
     var label: String
     var subtitle: String?
+    var clusterKey: String?       // category this node belongs to (for coloring)
     var x: Double
     var y: Double
     var z: Double
@@ -250,7 +251,9 @@ final class MindMapViewModel: ObservableObject {
         let previousNodes = Dictionary(uniqueKeysWithValues: nodes.map { ($0.id, $0) })
         let savedPositionMap = Dictionary(uniqueKeysWithValues: savedPositions.map { ("\($0.nodeType):\($0.nodeId)", $0) })
         let noteIds = Set(notes.map(\.id))
-        let sortedTags = Array(Set(notes.flatMap { $0.tags ?? [] }))
+        // Cluster on the curated categories ("suns"); fall back to topics for
+        // legacy notes that predate categories, so the map is never empty.
+        let sortedTags = Array(Set(notes.flatMap { clusterKeys(for: $0) }))
             .sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
 
         var nextNodes: [MapNode] = []
@@ -268,7 +271,8 @@ final class MindMapViewModel: ObservableObject {
                 id: nodeId,
                 kind: .tag,
                 label: tag,
-                subtitle: "Theme",
+                subtitle: "Category",
+                clusterKey: tag,
                 fallback: anchor,
                 z: deterministicDepth(for: nodeId, magnitude: 170),
                 radius: 18,
@@ -289,6 +293,7 @@ final class MindMapViewModel: ObservableObject {
                 kind: .note,
                 label: note.displayTitle,
                 subtitle: note.summary,
+                clusterKey: clusterKeys(for: note).first,
                 fallback: fallback,
                 z: deterministicDepth(for: note.id, magnitude: 220),
                 radius: 24 + min(10, Double(relatedCount) * 2.4),
@@ -297,12 +302,12 @@ final class MindMapViewModel: ObservableObject {
                 saved: savedPositionMap["note:\(note.id)"]
             ))
 
-            for tag in note.tags ?? [] where tagAnchors[tag] != nil {
+            for tag in clusterKeys(for: note) where tagAnchors[tag] != nil {
                 nextEdges.append(MapEdge(
                     id: "\(note.id)-tag:\(tag)",
                     sourceId: note.id,
                     targetId: "tag:\(tag)",
-                    weight: 0.38,
+                    weight: 0.5,
                     kind: .tag,
                     isManual: false
                 ))
@@ -334,6 +339,7 @@ final class MindMapViewModel: ObservableObject {
         kind: MapNode.Kind,
         label: String,
         subtitle: String?,
+        clusterKey: String?,
         fallback: CGPoint,
         z: Double,
         radius: Double,
@@ -344,6 +350,7 @@ final class MindMapViewModel: ObservableObject {
         if var previous {
             previous.label = label
             previous.subtitle = subtitle
+            previous.clusterKey = clusterKey
             previous.radius = radius
             previous.energy = energy
             return previous
@@ -354,6 +361,7 @@ final class MindMapViewModel: ObservableObject {
             kind: kind,
             label: label,
             subtitle: subtitle,
+            clusterKey: clusterKey,
             x: saved?.x ?? fallback.x,
             y: saved?.y ?? fallback.y,
             z: z,
@@ -363,8 +371,15 @@ final class MindMapViewModel: ObservableObject {
         )
     }
 
+    /// The keys a note clusters under: its curated categories, or its topic tags
+    /// for older notes that have no categories yet.
+    private func clusterKeys(for note: Note) -> [String] {
+        let cats = note.categories ?? []
+        return cats.isEmpty ? (note.tags ?? []) : cats
+    }
+
     private func fallbackPoint(for note: Note, index: Int, total: Int, tagAnchors: [String: CGPoint]) -> CGPoint {
-        let anchors = (note.tags ?? []).compactMap { tagAnchors[$0] }
+        let anchors = clusterKeys(for: note).compactMap { tagAnchors[$0] }
         let jitter = jitterPoint(for: note.id, radius: 86)
 
         if !anchors.isEmpty {
@@ -380,7 +395,7 @@ final class MindMapViewModel: ObservableObject {
 
     private func sharedTagEdges(notes: [Note]) -> [MapEdge] {
         var result: [MapEdge] = []
-        let taggedNotes = notes.map { ($0.id, Set($0.tags ?? [])) }
+        let taggedNotes = notes.map { ($0.id, Set(clusterKeys(for: $0))) }
 
         for i in taggedNotes.indices {
             for j in taggedNotes.indices where j > i {

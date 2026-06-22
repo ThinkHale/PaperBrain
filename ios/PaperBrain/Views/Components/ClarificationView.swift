@@ -72,31 +72,51 @@ private struct ClarificationCard: View {
     @Binding var item: NoteDetailViewModel.UnclearWord
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            // Context snippet
-            Text("Context")
-                .font(.caption.bold())
-                .foregroundStyle(.secondary)
-            Text(item.contextSnippet)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(8)
-                .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
-
-            // Cropped image if available
+        VStack(alignment: .leading, spacing: 12) {
+            // The cropped snippet from the note — the key bit of context.
             if let img = item.croppedImage {
                 Image(uiImage: img)
                     .resizable()
                     .scaledToFit()
-                    .frame(maxHeight: 100)
-                    .cornerRadius(8)
+                    .frame(maxWidth: .infinity)
+                    .frame(maxHeight: 120)
+                    .padding(8)
+                    .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(.tint.opacity(0.4), lineWidth: 1))
+            } else {
+                Label("No image preview available", systemImage: "photo")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
+            // AI's best guess
+            if item.word != "[unclear]" {
+                HStack(spacing: 6) {
+                    Image(systemName: "sparkles")
+                        .font(.caption2)
+                        .foregroundStyle(.tint)
+                    Text("AI guessed: ")
+                        .font(.caption).foregroundStyle(.secondary)
+                    + Text("“\(item.word)”").font(.caption.bold())
+                }
+            }
+
+            // Context snippet
+            if item.contextSnippet != "(no surrounding context)" {
+                Text(item.contextSnippet)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
             }
 
             // Correction input
-            Text("What does it say?")
+            Text("What does it actually say?")
                 .font(.caption.bold())
             TextField("Type the correct word…", text: $item.correction)
                 .textFieldStyle(.roundedBorder)
+                .autocorrectionDisabled()
         }
         .padding()
         .background(.background, in: RoundedRectangle(cornerRadius: 12))

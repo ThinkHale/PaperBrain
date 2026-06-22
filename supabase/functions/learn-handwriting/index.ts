@@ -52,10 +52,11 @@ Deno.serve(async (req) => {
 
     if (noteId) await assertOwnedNote(admin, noteId, user.id);
 
-    const clarificationRows = clarifications.map((c: { word: string; context?: string }) => ({
+    const clarificationRows = clarifications.map((c: { word: string; context?: string; guess?: string }) => ({
       user_id: user.id,
       note_id: noteId,
-      original: "[unclear]",
+      // Prefer the AI's original guess so the style guide learns "read X -> wrote Y".
+      original: c.guess && String(c.guess).trim() ? String(c.guess).trim() : "[unclear]",
       correction: c.word,
       context_snippet: c.context ?? null,
     }));
