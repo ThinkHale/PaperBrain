@@ -293,29 +293,39 @@ final class NoteDetailViewModel: ObservableObject {
             return
         }
 
-        // Fallback for notes processed before bounding boxes existed.
+        // Fallback for notes processed before bounding boxes existed: no per-word
+        // location, so show the whole page as context rather than nothing.
         guard let transcription = note.transcription else { return }
+        let page = firstPageImage
         let snippets = transcription.components(separatedBy: .newlines)
         unclearWords = snippets.compactMap { line in
             guard line.contains("[unclear]") else { return nil }
-            return UnclearWord(word: "[unclear]", contextSnippet: line)
+            return UnclearWord(word: "[unclear]", contextSnippet: line, croppedImage: page)
         }
         showClarification = !unclearWords.isEmpty
     }
 
+    private var firstPageImage: UIImage? {
+        guard let first = images.first else { return nil }
+        return imageCache[first.id]
+    }
+
     /// Crop the page image to an unclear word's bounding box (padded for legibility).
+    /// Falls back to the whole page if there's no usable box or the crop fails.
     private func croppedImage(for region: UnclearRegion) -> UIImage? {
-        guard let x = region.x, let y = region.y, let w = region.w, let h = region.h,
-              w > 0, h > 0 else { return nil }
         let page = region.page ?? 0
-        guard let noteImage = images.first(where: { ($0.pageNumber ?? 0) == page }) ?? images.first,
-              let source = imageCache[noteImage.id] else { return nil }
+        let source = (images.first { ($0.pageNumber ?? 0) == page }).flatMap { imageCache[$0.id] }
+            ?? firstPageImage
+        guard let source else { return nil }
+
+        guard let x = region.x, let y = region.y, let w = region.w, let h = region.h,
+              w > 0, h > 0 else { return source }
 
         // Pad the box by ~8% of its size (min 2% of the page) so the word is readable.
         let padX = max(w * 0.18, 0.02)
         let padY = max(h * 0.5, 0.02)
         let rect = CGRect(x: x - padX, y: y - padY, width: w + padX * 2, height: h + padY * 2)
-        return StorageService.cropImage(source, normalizedRect: rect)
+        return StorageService.cropImage(source, normalizedRect: rect) ?? source
     }
 
     func submitClarifications(userId: UUID) async {
