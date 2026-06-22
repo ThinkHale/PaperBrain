@@ -14,6 +14,7 @@ struct NoteDetailView: View {
     @State private var showAddCategory = false
     @State private var newTagText = ""
     @State private var lightboxImage: UIImage?
+    @State private var showDeleteConfirm = false
     @Environment(\.dismiss) private var dismiss
 
     init(note: Note) {
@@ -81,6 +82,20 @@ struct NoteDetailView: View {
             if let img = lightboxImage {
                 lightbox(img)
             }
+        }
+        // Push any edits (category, tags, title, organized) back into the list so
+        // they aren't lost from the in-memory copy when navigating back.
+        .onDisappear { notesVM.replace(vm.note) }
+        .confirmationDialog("Delete this note?", isPresented: $showDeleteConfirm, titleVisibility: .visible) {
+            Button("Delete", role: .destructive) {
+                Task {
+                    await notesVM.deleteNote(vm.note)
+                    dismiss()
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This permanently removes \"\(vm.note.displayTitle)\".")
         }
     }
 
@@ -408,11 +423,20 @@ struct NoteDetailView: View {
                 Button { vm.isEditing = true } label: {
                     Image(systemName: "pencil")
                 }
-            }
 
-            ShareLink(item: notesVM.exportMarkdown(for: vm.note),
-                      preview: SharePreview(vm.note.displayTitle)) {
-                Image(systemName: "square.and.arrow.up")
+                Menu {
+                    ShareLink(item: notesVM.exportMarkdown(for: vm.note),
+                              preview: SharePreview(vm.note.displayTitle)) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                    }
+                    Button(role: .destructive) {
+                        showDeleteConfirm = true
+                    } label: {
+                        Label("Delete Note", systemImage: "trash")
+                    }
+                } label: {
+                    Image(systemName: "ellipsis.circle")
+                }
             }
         }
     }

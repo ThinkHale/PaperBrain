@@ -28,9 +28,19 @@ final class StorageService {
         }
 
         let decoded = try JSONDecoder().decode(SignedURLResponse.self, from: data)
-        let signedPath = decoded.signedURL.hasPrefix("/")
-            ? "\(Config.supabaseURL)\(decoded.signedURL)"
-            : decoded.signedURL
+        // The API returns a path relative to the storage API root, e.g.
+        // "/object/sign/note-images/<path>?token=…" (no "/storage/v1" prefix).
+        // Build the absolute URL, tolerating each variant the API might return.
+        let raw = decoded.signedURL
+        let signedPath: String
+        if raw.hasPrefix("http") {
+            signedPath = raw
+        } else if raw.contains("/storage/v1/") {
+            signedPath = "\(Config.supabaseURL)\(raw)"
+        } else {
+            let suffix = raw.hasPrefix("/") ? raw : "/\(raw)"
+            signedPath = "\(Config.supabaseURL)/storage/v1\(suffix)"
+        }
         guard let signedURL = URL(string: signedPath) else { throw AppError.invalidData }
         return signedURL
     }

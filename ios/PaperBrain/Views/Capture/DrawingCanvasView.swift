@@ -14,6 +14,9 @@ struct DrawingCanvasView: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            // Controls live at the top — the PencilKit tool palette docks along
+            // the bottom of the screen, so bottom-bar buttons get covered.
+            controlStrip
             PencilCanvas(canvasView: $canvasView, isEmpty: $isEmpty)
                 .background(Color.white)
             if let error = vm.error {
@@ -28,29 +31,36 @@ struct DrawingCanvasView: View {
                 Button("Save") { save() }
                     .disabled(vm.isProcessing || isEmpty)
             }
-            ToolbarItemGroup(placement: .bottomBar) {
-                Button {
-                    canvasView.undoManager?.undo()
-                    isEmpty = canvasView.drawing.strokes.isEmpty
-                } label: { Label("Undo", systemImage: "arrow.uturn.backward") }
-                    .disabled(!(canvasView.undoManager?.canUndo ?? false))
-
-                Button {
-                    canvasView.undoManager?.redo()
-                    isEmpty = canvasView.drawing.strokes.isEmpty
-                } label: { Label("Redo", systemImage: "arrow.uturn.forward") }
-                    .disabled(!(canvasView.undoManager?.canRedo ?? false))
-
-                Spacer()
-
-                Button(role: .destructive) {
-                    canvasView.drawing = PKDrawing()
-                    isEmpty = true
-                } label: { Label("Clear", systemImage: "trash") }
-                    .disabled(isEmpty)
-            }
         }
         .overlay { if vm.isProcessing { ProcessingOverlay(message: vm.statusMessage) } }
+    }
+
+    private var controlStrip: some View {
+        HStack(spacing: 22) {
+            Button {
+                canvasView.undoManager?.undo()
+                isEmpty = canvasView.drawing.strokes.isEmpty
+            } label: { Image(systemName: "arrow.uturn.backward") }
+                .disabled(!(canvasView.undoManager?.canUndo ?? false))
+
+            Button {
+                canvasView.undoManager?.redo()
+                isEmpty = canvasView.drawing.strokes.isEmpty
+            } label: { Image(systemName: "arrow.uturn.forward") }
+                .disabled(!(canvasView.undoManager?.canRedo ?? false))
+
+            Spacer()
+
+            Button(role: .destructive) {
+                canvasView.drawing = PKDrawing()
+                isEmpty = true
+            } label: { Label("Clear", systemImage: "trash") }
+                .disabled(isEmpty)
+        }
+        .font(.body.weight(.medium))
+        .padding(.horizontal, 18)
+        .padding(.vertical, 10)
+        .background(.bar)
     }
 
     private func save() {
