@@ -3,60 +3,47 @@ import PhotosUI
 import PDFKit
 
 struct UploadView: View {
-    @EnvironmentObject private var notesVM: NotesViewModel
-    @EnvironmentObject private var toastVM: ToastViewModel
+    /// Called with the created note once processing finishes (used by the capture hub).
+    var onComplete: ((Note) -> Void)? = nil
+
     @StateObject private var vm = UploadViewModel()
     @State private var showPhotoPicker = false
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var showDocumentPicker = false
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 24) {
-                if vm.selectedImages.isEmpty {
-                    dropZone
-                } else {
-                    pagePreview
-                }
-                actionButtons
+        VStack(spacing: 24) {
+            if vm.selectedImages.isEmpty {
+                dropZone
+            } else {
+                pagePreview
             }
-            .padding()
-            .navigationTitle("Scan Notes")
-            .photosPicker(isPresented: $showPhotoPicker,
-                          selection: $pickerItems,
-                          maxSelectionCount: 20,
-                          matching: .any(of: [.images, .screenshots]))
-            .onChange(of: pickerItems) { _, items in
-                loadPickerItems(items)
-            }
-            .fileImporter(isPresented: $showDocumentPicker,
-                          allowedContentTypes: [.pdf],
-                          allowsMultipleSelection: false) { result in
-                if case .success(let urls) = result,
-                   let url = urls.first,
-                   url.startAccessingSecurityScopedResource() {
-                    defer { url.stopAccessingSecurityScopedResource() }
-                    if let data = try? Data(contentsOf: url) {
-                        vm.addPDF(data: data)
-                    }
-                }
-            }
-            .overlay {
-                if vm.isProcessing { processingOverlay }
-            }
-            .sheet(item: $vm.completedNote) { note in
-                NavigationStack {
-                    NoteDetailView(note: note)
-                        .toolbar {
-                            ToolbarItem(placement: .navigationBarTrailing) {
-                                Button("Done") {
-                                    notesVM.prepend(note)
-                                    vm.clearAll()
-                                }
-                            }
-                        }
+            actionButtons
+        }
+        .padding()
+        .navigationTitle("Scan")
+        .navigationBarTitleDisplayMode(.inline)
+        .photosPicker(isPresented: $showPhotoPicker,
+                      selection: $pickerItems,
+                      maxSelectionCount: 20,
+                      matching: .any(of: [.images, .screenshots]))
+        .onChange(of: pickerItems) { _, items in
+            loadPickerItems(items)
+        }
+        .fileImporter(isPresented: $showDocumentPicker,
+                      allowedContentTypes: [.pdf],
+                      allowsMultipleSelection: false) { result in
+            if case .success(let urls) = result,
+               let url = urls.first,
+               url.startAccessingSecurityScopedResource() {
+                defer { url.stopAccessingSecurityScopedResource() }
+                if let data = try? Data(contentsOf: url) {
+                    vm.addPDF(data: data)
                 }
             }
+        }
+        .overlay {
+            if vm.isProcessing { processingOverlay }
         }
     }
 
@@ -161,7 +148,13 @@ struct UploadView: View {
         VStack(spacing: 12) {
             if !vm.selectedImages.isEmpty {
                 Button {
-                    Task { await vm.process() }
+                    Task {
+                        await vm.process()
+                        if let note = vm.completedNote {
+                            onComplete?(note)
+                            vm.clearAll()
+                        }
+                    }
                 } label: {
                     Label("Process with AI", systemImage: "wand.and.stars")
                         .frame(maxWidth: .infinity)

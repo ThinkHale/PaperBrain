@@ -1,16 +1,17 @@
 import Foundation
 import UIKit
+import Supabase
 
 final class StorageService {
     static let shared = StorageService()
     private init() {}
 
-    func signedURL(for path: String, expiresIn: Int = 3600) async throws -> URL {
+    func signedURL(for path: String, bucket: String = "note-images", expiresIn: Int = 3600) async throws -> URL {
         let session = try await SupabaseService.shared.client.auth.session
         let encodedPath = path.split(separator: "/")
             .map { String($0).addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? String($0) }
             .joined(separator: "/")
-        guard let url = URL(string: "\(Config.supabaseURL)/storage/v1/object/sign/note-images/\(encodedPath)") else {
+        guard let url = URL(string: "\(Config.supabaseURL)/storage/v1/object/sign/\(bucket)/\(encodedPath)") else {
             throw AppError.invalidData
         }
 
@@ -51,15 +52,46 @@ final class StorageService {
     }
 
     static func crop(_ image: UIImage, normalizedRect: CGRect) -> Data? {
-        guard let cgImage = image.cgImage else { return nil }
+        cropImage(image, normalizedRect: normalizedRect)?.jpegData(compressionQuality: 0.88)
+    }
+
+    /// Crop a UIImage to a normalized (0-1) rect, respecting orientation.
+    static func cropImage(_ image: UIImage, normalizedRect: CGRect) -> UIImage? {
+        let normalized = image.fixedOrientation()
+        guard let cgImage = normalized.cgImage else { return nil }
+        let clamped = normalizedRect.intersection(CGRect(x: 0, y: 0, width: 1, height: 1))
+        guard !clamped.isNull, clamped.width > 0, clamped.height > 0 else { return nil }
         let pixelRect = CGRect(
-            x: normalizedRect.minX * CGFloat(cgImage.width),
-            y: normalizedRect.minY * CGFloat(cgImage.height),
-            width: normalizedRect.width * CGFloat(cgImage.width),
-            height: normalizedRect.height * CGFloat(cgImage.height)
+            x: clamped.minX * CGFloat(cgImage.width),
+            y: clamped.minY * CGFloat(cgImage.height),
+            width: clamped.width * CGFloat(cgImage.width),
+            height: clamped.height * CGFloat(cgImage.height)
         ).integral
         guard let cropped = cgImage.cropping(to: pixelRect) else { return nil }
-        return UIImage(cgImage: cropped).jpegData(compressionQuality: 0.88)
+        return UIImage(cgImage: cropped)
+    }
+
+    /// Upload an arbitrary asset (audio / drawing blob) to the private note-assets bucket.
+    func uploadAsset(data: Data, contentType: String, path: String) async throws {
+        try await SupabaseService.shared.client.storage
+            .from("note-assets")
+            .upload(path, data: data, options: FileOptions(contentType: contentType, upsert: true))
+    }
+
+    func downloadAsset(path: String) async throws -> Data {
+        try await SupabaseService.shared.client.storage
+            .from("note-assets")
+            .download(path: path)
+    }
+}
+
+private extension UIImage {
+    /// Redraw the image so its pixel buffer matches its displayed orientation,
+    /// so normalized crop rects line up with what the user sees.
+    func fixedOrientation() -> UIImage {
+        guard imageOrientation != .up else { return self }
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in draw(in: CGRect(origin: .zero, size: size)) }
     }
 }
 

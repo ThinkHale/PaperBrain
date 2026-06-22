@@ -116,6 +116,58 @@ final class SupabaseService {
             .execute()
     }
 
+    func updateNoteCategories(noteId: String, categories: [String]) async throws {
+        struct Update: Encodable {
+            let categories: [String]
+            let updatedAt: String
+            enum CodingKeys: String, CodingKey {
+                case categories
+                case updatedAt = "updated_at"
+            }
+        }
+        try await client
+            .from("notes")
+            .update(Update(categories: categories, updatedAt: ISO8601DateFormatter().string(from: Date())))
+            .eq("id", value: noteId)
+            .execute()
+    }
+
+    func updateNoteAssetPath(noteId: String, drawingPath: String? = nil, audioPath: String? = nil) async throws {
+        struct Update: Encodable {
+            let drawingPath: String?
+            let audioPath: String?
+            enum CodingKeys: String, CodingKey {
+                case drawingPath = "drawing_path"
+                case audioPath = "audio_path"
+            }
+        }
+        try await client
+            .from("notes")
+            .update(Update(drawingPath: drawingPath, audioPath: audioPath))
+            .eq("id", value: noteId)
+            .execute()
+    }
+
+    /// After an Apple Pencil note is processed as an image, mark it as a drawing
+    /// and attach the raw PKDrawing blob so it stays re-editable.
+    func setDrawingMeta(noteId: String, drawingPath: String) async throws {
+        struct Update: Encodable {
+            let noteType = NoteType.drawing.rawValue
+            let sourceType = SourceType.drawing.rawValue
+            let drawingPath: String
+            enum CodingKeys: String, CodingKey {
+                case noteType = "note_type"
+                case sourceType = "source_type"
+                case drawingPath = "drawing_path"
+            }
+        }
+        try await client
+            .from("notes")
+            .update(Update(drawingPath: drawingPath))
+            .eq("id", value: noteId)
+            .execute()
+    }
+
     func updateNoteOrganized(noteId: String, organized: String) async throws {
         struct Update: Encodable {
             let organized: String
@@ -321,6 +373,105 @@ final class SupabaseService {
             .upsert(Upsert(userId: userId, nodeType: nodeType, nodeId: nodeId, x: x, y: y, updatedAt: ISO8601DateFormatter().string(from: Date())),
                     onConflict: "user_id,node_type,node_id")
             .execute()
+    }
+
+    // MARK: - Tags (vocabulary)
+
+    func fetchTags(userId: UUID) async throws -> [Tag] {
+        try await client
+            .from("tags")
+            .select()
+            .eq("user_id", value: userId.uuidString)
+            .order("kind", ascending: true)
+            .order("name", ascending: true)
+            .execute()
+            .value
+    }
+
+    @discardableResult
+    func insertTag(userId: UUID, name: String, kind: TagKind, color: String?) async throws -> Tag {
+        let row = TagCreate(userId: userId.uuidString, name: name, kind: kind.rawValue, color: color)
+        return try await client
+            .from("tags")
+            .insert(row)
+            .select()
+            .single()
+            .execute()
+            .value
+    }
+
+    func renameTag(id: String, name: String) async throws {
+        struct Update: Encodable { let name: String }
+        try await client.from("tags").update(Update(name: name)).eq("id", value: id).execute()
+    }
+
+    func updateTagColor(id: String, color: String) async throws {
+        struct Update: Encodable { let color: String }
+        try await client.from("tags").update(Update(color: color)).eq("id", value: id).execute()
+    }
+
+    func deleteTag(id: String) async throws {
+        try await client.from("tags").delete().eq("id", value: id).execute()
+    }
+
+    // MARK: - Todos
+
+    func fetchTodos(userId: UUID) async throws -> [Todo] {
+        try await client
+            .from("todos")
+            .select()
+            .eq("user_id", value: userId.uuidString)
+            .order("done", ascending: true)
+            .order("position", ascending: true)
+            .order("created_at", ascending: false)
+            .execute()
+            .value
+    }
+
+    func fetchTodos(noteId: String) async throws -> [Todo] {
+        try await client
+            .from("todos")
+            .select()
+            .eq("note_id", value: noteId)
+            .order("position", ascending: true)
+            .execute()
+            .value
+    }
+
+    @discardableResult
+    func insertTodo(_ todo: TodoCreate) async throws -> Todo {
+        try await client
+            .from("todos")
+            .insert(todo)
+            .select()
+            .single()
+            .execute()
+            .value
+    }
+
+    func setTodoDone(id: String, done: Bool) async throws {
+        struct Update: Encodable {
+            let done: Bool
+            let updatedAt: String
+            enum CodingKeys: String, CodingKey {
+                case done
+                case updatedAt = "updated_at"
+            }
+        }
+        try await client
+            .from("todos")
+            .update(Update(done: done, updatedAt: ISO8601DateFormatter().string(from: Date())))
+            .eq("id", value: id)
+            .execute()
+    }
+
+    func updateTodoText(id: String, text: String) async throws {
+        struct Update: Encodable { let text: String }
+        try await client.from("todos").update(Update(text: text)).eq("id", value: id).execute()
+    }
+
+    func deleteTodo(id: String) async throws {
+        try await client.from("todos").delete().eq("id", value: id).execute()
     }
 }
 

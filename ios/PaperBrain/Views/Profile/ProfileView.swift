@@ -12,6 +12,7 @@ struct ProfileView: View {
                     Section { ProgressView() }
                 } else {
                     displayNameSection
+                    organizationSection
                     modelSection
                     handwritingSection
                     accountSection
@@ -48,6 +49,16 @@ struct ProfileView: View {
         Section("Display Name") {
             TextField("Your name", text: $vm.displayName)
                 .autocapitalization(.words)
+        }
+    }
+
+    private var organizationSection: some View {
+        Section("Organization") {
+            NavigationLink {
+                TagManagerView()
+            } label: {
+                Label("Tags & Categories", systemImage: "tag")
+            }
         }
     }
 

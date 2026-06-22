@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1C100CF930B3E7893520AD2C /* VoiceRecorderViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42D9F96B6CE3B930F883820D /* VoiceRecorderViewModel.swift */; };
+		1FE59A213FCFCBB9A50F0415 /* Todo.swift in Sources */ = {isa = PBXBuildFile; fileRef = D24333CA30FE6091E5F06A52 /* Todo.swift */; };
+		30FA68CD6DC10028A2790140 /* TagManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02411CA897E86D2062BEE4EE /* TagManagerView.swift */; };
+		4797ECD7AAB0EC46556AAFF8 /* ComposeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74E10C60815D093F80EBC191 /* ComposeViewModel.swift */; };
+		503AA1240B5D517177F72267 /* TagsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4224186371AEB0939E2FA144 /* TagsViewModel.swift */; };
+		B064B47853A8E1DE4A433CEC /* CaptureHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C10CA1A79A6ED9E1DF1DA0F8 /* CaptureHubView.swift */; };
+		B0B73741DDDC17AAF919F062 /* TodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 921D5D141C33DFE8A06023CF /* TodoListView.swift */; };
+		B3EFFD5D474C078246660E75 /* VoiceRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66838AFFF7730972D847E59E /* VoiceRecorderView.swift */; };
 		BF0000010000000000000001 /* Config.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000001 /* Config.swift */; };
 		BF0000010000000000000002 /* IlluminoteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000002 /* IlluminoteApp.swift */; };
 		BF0000010000000000000003 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF0000020000000000000003 /* Annotation.swift */; };
@@ -37,9 +45,25 @@
 		BF000001000000000000001C /* UploadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000001C /* UploadView.swift */; };
 		BF000001000000000000001D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF000002000000000000001D /* Assets.xcassets */; };
 		BF000001000000000000001E /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = BF0000060000000000000001 /* Supabase */; };
+		CA169F527D49F7ADD2337F38 /* Tag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B1F5B4FAF8735CBBEEC72D6 /* Tag.swift */; };
+		CCD86D6A2C98EEE44BA5D820 /* TodosViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35EB3AE13175FD4046DD8505 /* TodosViewModel.swift */; };
+		DBEC07BBC7E5452BCD02D61D /* DrawingCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C22EAA8B3BE9F68D5F689F /* DrawingCanvasView.swift */; };
+		EF33B9D0B89CAB90C3C563D9 /* AudioPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A29D65CE8346054946E32F39 /* AudioPlayerView.swift */; };
+		F16E5BE273CDC825A96B36DD /* ComposeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48627D19F61376F7255AF78E /* ComposeView.swift */; };
+		FFC4C2C50D029C1E96AAC9B4 /* SplitCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8704E4D6F9B56964FE9236A /* SplitCanvasView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		02411CA897E86D2062BEE4EE /* TagManagerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TagManagerView.swift; sourceTree = "<group>"; };
+		2B1F5B4FAF8735CBBEEC72D6 /* Tag.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Tag.swift; sourceTree = "<group>"; };
+		35EB3AE13175FD4046DD8505 /* TodosViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodosViewModel.swift; sourceTree = "<group>"; };
+		4224186371AEB0939E2FA144 /* TagsViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TagsViewModel.swift; sourceTree = "<group>"; };
+		42D9F96B6CE3B930F883820D /* VoiceRecorderViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceRecorderViewModel.swift; sourceTree = "<group>"; };
+		48627D19F61376F7255AF78E /* ComposeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ComposeView.swift; sourceTree = "<group>"; };
+		66838AFFF7730972D847E59E /* VoiceRecorderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoiceRecorderView.swift; sourceTree = "<group>"; };
+		74E10C60815D093F80EBC191 /* ComposeViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ComposeViewModel.swift; sourceTree = "<group>"; };
+		921D5D141C33DFE8A06023CF /* TodoListView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TodoListView.swift; sourceTree = "<group>"; };
+		A29D65CE8346054946E32F39 /* AudioPlayerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AudioPlayerView.swift; sourceTree = "<group>"; };
 		BF0000020000000000000001 /* Config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Config.swift; sourceTree = "<group>"; };
 		BF0000020000000000000002 /* IlluminoteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IlluminoteApp.swift; sourceTree = "<group>"; };
 		BF0000020000000000000003 /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
@@ -70,6 +94,10 @@
 		BF000002000000000000001C /* UploadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UploadView.swift; sourceTree = "<group>"; };
 		BF000002000000000000001D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BF000002000000000000001E /* Illuminotes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Illuminotes.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C10CA1A79A6ED9E1DF1DA0F8 /* CaptureHubView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CaptureHubView.swift; sourceTree = "<group>"; };
+		C5C22EAA8B3BE9F68D5F689F /* DrawingCanvasView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DrawingCanvasView.swift; sourceTree = "<group>"; };
+		D24333CA30FE6091E5F06A52 /* Todo.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Todo.swift; sourceTree = "<group>"; };
+		D8704E4D6F9B56964FE9236A /* SplitCanvasView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SplitCanvasView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +112,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3BA93125BB745EBBAEC3AF44 /* Todos */ = {
+			isa = PBXGroup;
+			children = (
+				921D5D141C33DFE8A06023CF /* TodoListView.swift */,
+			);
+			name = Todos;
+			path = Todos;
+			sourceTree = "<group>";
+		};
+		6FD258BAA69B9BA1F42A2509 /* Tags */ = {
+			isa = PBXGroup;
+			children = (
+				02411CA897E86D2062BEE4EE /* TagManagerView.swift */,
+			);
+			name = Tags;
+			path = Tags;
+			sourceTree = "<group>";
+		};
 		BF0000040000000000000001 = {
 			isa = PBXGroup;
 			children = (
@@ -115,6 +161,8 @@
 				BF0000020000000000000005 /* Note.swift */,
 				BF0000020000000000000006 /* Profile.swift */,
 				BF0000020000000000000007 /* Relation.swift */,
+				2B1F5B4FAF8735CBBEEC72D6 /* Tag.swift */,
+				D24333CA30FE6091E5F06A52 /* Todo.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -138,6 +186,10 @@
 				BF000002000000000000000E /* NotesViewModel.swift */,
 				BF000002000000000000000F /* ProfileViewModel.swift */,
 				BF0000020000000000000010 /* UploadViewModel.swift */,
+				35EB3AE13175FD4046DD8505 /* TodosViewModel.swift */,
+				4224186371AEB0939E2FA144 /* TagsViewModel.swift */,
+				74E10C60815D093F80EBC191 /* ComposeViewModel.swift */,
+				42D9F96B6CE3B930F883820D /* VoiceRecorderViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -153,6 +205,9 @@
 				BF000004000000000000000F /* Notes */,
 				BF0000040000000000000010 /* Profile */,
 				BF0000040000000000000011 /* Upload */,
+				FE91FED52AAD00C81487FD0C /* Capture */,
+				3BA93125BB745EBBAEC3AF44 /* Todos */,
+				6FD258BAA69B9BA1F42A2509 /* Tags */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -161,6 +216,7 @@
 			isa = PBXGroup;
 			children = (
 				BF0000020000000000000011 /* AnnotationCanvasView.swift */,
+				D8704E4D6F9B56964FE9236A /* SplitCanvasView.swift */,
 			);
 			path = Annotations;
 			sourceTree = "<group>";
@@ -203,6 +259,7 @@
 				BF0000020000000000000014 /* MarkdownView.swift */,
 				BF0000020000000000000015 /* TagChipView.swift */,
 				BF0000020000000000000016 /* ToastView.swift */,
+				A29D65CE8346054946E32F39 /* AudioPlayerView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -238,6 +295,18 @@
 				BF000002000000000000001C /* UploadView.swift */,
 			);
 			path = Upload;
+			sourceTree = "<group>";
+		};
+		FE91FED52AAD00C81487FD0C /* Capture */ = {
+			isa = PBXGroup;
+			children = (
+				C10CA1A79A6ED9E1DF1DA0F8 /* CaptureHubView.swift */,
+				48627D19F61376F7255AF78E /* ComposeView.swift */,
+				C5C22EAA8B3BE9F68D5F689F /* DrawingCanvasView.swift */,
+				66838AFFF7730972D847E59E /* VoiceRecorderView.swift */,
+			);
+			name = Capture;
+			path = Capture;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -343,6 +412,20 @@
 				BF000001000000000000001A /* NoteListView.swift in Sources */,
 				BF000001000000000000001B /* ProfileView.swift in Sources */,
 				BF000001000000000000001C /* UploadView.swift in Sources */,
+				CA169F527D49F7ADD2337F38 /* Tag.swift in Sources */,
+				1FE59A213FCFCBB9A50F0415 /* Todo.swift in Sources */,
+				CCD86D6A2C98EEE44BA5D820 /* TodosViewModel.swift in Sources */,
+				503AA1240B5D517177F72267 /* TagsViewModel.swift in Sources */,
+				4797ECD7AAB0EC46556AAFF8 /* ComposeViewModel.swift in Sources */,
+				1C100CF930B3E7893520AD2C /* VoiceRecorderViewModel.swift in Sources */,
+				B064B47853A8E1DE4A433CEC /* CaptureHubView.swift in Sources */,
+				F16E5BE273CDC825A96B36DD /* ComposeView.swift in Sources */,
+				DBEC07BBC7E5452BCD02D61D /* DrawingCanvasView.swift in Sources */,
+				B3EFFD5D474C078246660E75 /* VoiceRecorderView.swift in Sources */,
+				B0B73741DDDC17AAF919F062 /* TodoListView.swift in Sources */,
+				30FA68CD6DC10028A2790140 /* TagManagerView.swift in Sources */,
+				FFC4C2C50D029C1E96AAC9B4 /* SplitCanvasView.swift in Sources */,
+				EF33B9D0B89CAB90C3C563D9 /* AudioPlayerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -473,14 +556,16 @@
 				ASSETCATALOG_COMPILER_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = MZ3635323W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Illuminote;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Illuminote uses the camera to photograph handwritten notes.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Illuminotes uses the camera to photograph handwritten notes.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Illuminotes records voice notes you choose to capture.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Illuminotes reads photos to import handwritten notes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -492,7 +577,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.thinkhale.illuminote;
 				PRODUCT_NAME = Illuminotes;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -510,14 +595,16 @@
 				ASSETCATALOG_COMPILER_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = MZ3635323W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = Illuminote;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Illuminote uses the camera to photograph handwritten notes.";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Illuminotes uses the camera to photograph handwritten notes.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Illuminotes records voice notes you choose to capture.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Illuminotes reads photos to import handwritten notes.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -529,7 +616,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.thinkhale.illuminote;
 				PRODUCT_NAME = Illuminotes;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

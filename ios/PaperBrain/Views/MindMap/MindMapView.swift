@@ -320,7 +320,7 @@ struct MindMapView: View {
                 nodeGlyph(for: node)
 
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(node.kind == .tag ? "Theme" : "Note")
+                    Text(node.kind == .tag ? "Category" : "Note")
                         .font(.caption2.weight(.bold))
                         .textCase(.uppercase)
                         .foregroundStyle(.white.opacity(0.5))
@@ -548,10 +548,23 @@ struct MindMapView: View {
         let alpha = active ? 0.88 : 0.32
         switch node.kind {
         case .note:
-            return Color(red: 0.24 + depth * 0.16, green: 0.84, blue: 0.92).opacity(alpha)
+            // Notes glow with the hue of their cluster, so each constellation reads as one family.
+            guard let key = node.clusterKey, !key.isEmpty else {
+                return Color(red: 0.24 + depth * 0.16, green: 0.84, blue: 0.92).opacity(alpha)
+            }
+            let hue = clusterHue(for: key)
+            return Color(hue: hue, saturation: 0.62, brightness: 0.92 + Double(depth) * 0.06).opacity(alpha)
         case .tag:
-            return Color(red: 0.78, green: 0.42 + depth * 0.18, blue: 1.0).opacity(alpha)
+            // Category "suns" — brighter, distinctly hued per category.
+            let hue = clusterHue(for: node.label)
+            return Color(hue: hue, saturation: 0.78, brightness: 1.0).opacity(alpha)
         }
+    }
+
+    /// Stable hue (0-1) per category label so clusters keep consistent colors.
+    private func clusterHue(for key: String) -> Double {
+        let hash = key.lowercased().utf8.reduce(UInt64(5381)) { ($0 &* 33) &+ UInt64($1) }
+        return Double(hash % 360) / 360.0
     }
 
     private func edgeColor(_ edge: MapEdge, active: Bool, depth: CGFloat) -> Color {
@@ -653,7 +666,7 @@ struct MindMapView: View {
     private var toolbarContent: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarTrailing) {
             Menu {
-                Button("All themes") { vm.tagFilter = nil }
+                Button("All categories") { vm.tagFilter = nil }
                 ForEach(vm.allTags, id: \.self) { tag in
                     Button(tag) { vm.tagFilter = tag }
                 }
