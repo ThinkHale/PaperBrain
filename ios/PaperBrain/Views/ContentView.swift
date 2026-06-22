@@ -24,7 +24,7 @@ struct ContentView: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: 96, height: 96)
-            Text("Illuminote")
+            Text("Illuminotes")
                 .font(.largeTitle.bold())
             Text("Your thoughts. Intelligently connected.")
                 .font(.subheadline)

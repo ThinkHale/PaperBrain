@@ -28,7 +28,21 @@ struct DrawingCanvasView: View {
                 Button("Save") { save() }
                     .disabled(vm.isProcessing || isEmpty)
             }
-            ToolbarItem(placement: .bottomBar) {
+            ToolbarItemGroup(placement: .bottomBar) {
+                Button {
+                    canvasView.undoManager?.undo()
+                    isEmpty = canvasView.drawing.strokes.isEmpty
+                } label: { Label("Undo", systemImage: "arrow.uturn.backward") }
+                    .disabled(!(canvasView.undoManager?.canUndo ?? false))
+
+                Button {
+                    canvasView.undoManager?.redo()
+                    isEmpty = canvasView.drawing.strokes.isEmpty
+                } label: { Label("Redo", systemImage: "arrow.uturn.forward") }
+                    .disabled(!(canvasView.undoManager?.canRedo ?? false))
+
+                Spacer()
+
                 Button(role: .destructive) {
                     canvasView.drawing = PKDrawing()
                     isEmpty = true

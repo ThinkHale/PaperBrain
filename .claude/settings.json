@@ -10,7 +10,13 @@
       "Bash(ruby --version)",
       "Bash(ruby -e ' *)",
       "Bash(ruby /private/tmp/claude-501/-Users-Cody-Hale-ThinkHale-PaperBrain/45bf90b8-d037-4c6a-a47b-f2de09cd7a90/scratchpad/wire_project.rb)",
-      "Bash(supabase --version)"
+      "Bash(supabase --version)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git merge *)",
+      "Bash(git branch *)"
     ],
     "additionalDirectories": [
       "/private/tmp/claude-501/-Users-Cody-Hale-ThinkHale-PaperBrain/45bf90b8-d037-4c6a-a47b-f2de09cd7a90/scratchpad"

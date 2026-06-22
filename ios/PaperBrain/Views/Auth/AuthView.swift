@@ -17,7 +17,7 @@ struct AuthView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(maxWidth: 240)
-                        .accessibilityLabel("Illuminote")
+                        .accessibilityLabel("Illuminotes")
                     Text("Your thoughts. Intelligently connected.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)

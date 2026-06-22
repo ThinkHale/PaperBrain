@@ -561,7 +561,7 @@
 				DEVELOPMENT_TEAM = MZ3635323W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Illuminote;
+				INFOPLIST_KEY_CFBundleDisplayName = Illuminotes;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Illuminotes uses the camera to photograph handwritten notes.";
@@ -600,7 +600,7 @@
 				DEVELOPMENT_TEAM = MZ3635323W;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Illuminote;
+				INFOPLIST_KEY_CFBundleDisplayName = Illuminotes;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Illuminotes uses the camera to photograph handwritten notes.";

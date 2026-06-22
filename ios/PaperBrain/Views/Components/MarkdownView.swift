@@ -3,15 +3,21 @@ import WebKit
 
 /// Renders a Markdown string using a lightweight WKWebView-based renderer.
 /// Falls back to plain text if the input is empty.
+///
+/// The web view reports its content height back to SwiftUI so it occupies a
+/// real, bounded frame — otherwise the transparent web view overlaps the
+/// sections below it in a ScrollView.
 struct MarkdownView: View {
     let text: String
+    @State private var height: CGFloat = 1
 
     var body: some View {
         if text.isEmpty {
             Text("No content")
                 .foregroundStyle(.secondary)
         } else {
-            MarkdownWebView(markdown: text)
+            MarkdownWebView(markdown: text, height: $height)
+                .frame(height: max(height, 1))
         }
     }
 }
@@ -20,6 +26,7 @@ struct MarkdownView: View {
 
 private struct MarkdownWebView: UIViewRepresentable {
     let markdown: String
+    @Binding var height: CGFloat
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
@@ -28,23 +35,40 @@ private struct MarkdownWebView: UIViewRepresentable {
         webView.isOpaque = false
         webView.backgroundColor = .clear
         webView.scrollView.isScrollEnabled = false
+        webView.scrollView.bounces = false
         webView.navigationDelegate = context.coordinator
         return webView
     }
 
     func updateUIView(_ webView: WKWebView, context: Context) {
-        let html = buildHTML(markdown: markdown)
-        webView.loadHTMLString(html, baseURL: nil)
+        context.coordinator.parent = self
+        // Only reload when the markdown actually changes, so height callbacks
+        // don't trigger an endless reload loop.
+        if context.coordinator.loadedMarkdown != markdown {
+            context.coordinator.loadedMarkdown = markdown
+            webView.loadHTMLString(buildHTML(markdown: markdown), baseURL: nil)
+        }
     }
 
-    func makeCoordinator() -> Coordinator { Coordinator() }
+    func makeCoordinator() -> Coordinator { Coordinator(self) }
 
     final class Coordinator: NSObject, WKNavigationDelegate {
+        var parent: MarkdownWebView
+        var loadedMarkdown: String?
+
+        init(_ parent: MarkdownWebView) { self.parent = parent }
+
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            // Resize WebView to fit content height
-            webView.evaluateJavaScript("document.body.scrollHeight") { result, _ in
-                if let height = result as? CGFloat {
-                    webView.frame.size.height = height
+            measure(webView)
+        }
+
+        private func measure(_ webView: WKWebView) {
+            webView.evaluateJavaScript("document.body.scrollHeight") { [weak self] result, _ in
+                guard let self, let height = result as? CGFloat, height > 0 else { return }
+                DispatchQueue.main.async {
+                    if abs(self.parent.height - height) > 1 {
+                        self.parent.height = height
+                    }
                 }
             }
         }
@@ -52,7 +76,6 @@ private struct MarkdownWebView: UIViewRepresentable {
         func webView(_ webView: WKWebView,
                      decidePolicyFor action: WKNavigationAction,
                      decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-            // Allow initial load; open external links in Safari
             if action.navigationType == .linkActivated, let url = action.request.url {
                 UIApplication.shared.open(url)
                 decisionHandler(.cancel)
@@ -63,7 +86,6 @@ private struct MarkdownWebView: UIViewRepresentable {
     }
 
     private func buildHTML(markdown: String) -> String {
-        // Escape for inclusion in JS string
         let escaped = markdown
             .replacingOccurrences(of: "\\", with: "\\\\")
             .replacingOccurrences(of: "`", with: "\\`")
@@ -108,26 +130,5 @@ private struct MarkdownWebView: UIViewRepresentable {
 
     private var isDarkMode: Bool {
         UITraitCollection.current.userInterfaceStyle == .dark
-    }
-}
-
-// MARK: - Dynamic height wrapper
-
-/// Wraps MarkdownWebView in a dynamically-sized frame.
-struct MarkdownBlock: View {
-    let text: String
-    @State private var height: CGFloat = 200
-
-    var body: some View {
-        MarkdownWebView(markdown: text)
-            .frame(height: height)
-            .onPreferenceChange(MarkdownHeightKey.self) { height = $0 }
-    }
-}
-
-private struct MarkdownHeightKey: PreferenceKey {
-    static var defaultValue: CGFloat = 200
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
     }
 }

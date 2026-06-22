@@ -7,6 +7,7 @@ final class NoteDetailViewModel: ObservableObject {
     @Published var note: Note
     @Published var images: [NoteImage] = []
     @Published var imageCache: [String: UIImage] = [:]
+    @Published var imageErrors: [String: String] = [:]   // note-image id -> failure reason
     @Published var annotations: [Annotation] = []
     @Published var relations: [Relation] = []
     @Published var relatedNotes: [String: Note] = [:]
@@ -70,12 +71,35 @@ final class NoteDetailViewModel: ObservableObject {
     private func downloadImages(_ noteImages: [NoteImage]) async {
         for ni in noteImages {
             guard imageCache[ni.id] == nil else { continue }
-            if let url = try? await storage.signedURL(for: ni.storagePath),
-               let (data, _) = try? await URLSession.shared.data(from: url),
-               let img = UIImage(data: data) {
-                imageCache[ni.id] = img
-            }
+            await downloadImage(ni)
         }
+    }
+
+    /// Download a single note image, recording a human-readable reason on failure
+    /// so the UI can show what went wrong instead of an endless spinner.
+    func downloadImage(_ ni: NoteImage) async {
+        imageErrors[ni.id] = nil
+        do {
+            let url = try await storage.signedURL(for: ni.storagePath)
+            let (data, response) = try await URLSession.shared.data(from: url)
+            let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+            guard status < 400 else {
+                imageErrors[ni.id] = "Server returned HTTP \(status)"
+                return
+            }
+            if let img = UIImage(data: data) {
+                imageCache[ni.id] = img
+            } else {
+                imageErrors[ni.id] = "Unreadable image (\(data.count) bytes)"
+            }
+        } catch {
+            imageErrors[ni.id] = error.localizedDescription
+        }
+    }
+
+    func retryImage(_ ni: NoteImage) async {
+        imageCache[ni.id] = nil
+        await downloadImage(ni)
     }
 
     // MARK: - Related notes

@@ -37,6 +37,7 @@ struct NoteDetailView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar(.hidden, for: .tabBar)
         .toolbar { toolbarContent }
         .task { await vm.loadAll() }
         .sheet(isPresented: $vm.showClarification) {
@@ -157,15 +158,17 @@ struct NoteDetailView: View {
         }
     }
 
+    // Topics are secondary — a muted footnote that aids search, not a primary label.
+    @ViewBuilder
     private var topicRow: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                ForEach(vm.note.tags ?? [], id: \.self) { tag in
-                    TagChip(tag: tag, deletable: vm.isEditing) {
-                        Task { await vm.removeTag(tag) }
+        if vm.isEditing {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(vm.note.tags ?? [], id: \.self) { tag in
+                        TagChip(tag: tag, deletable: true) {
+                            Task { await vm.removeTag(tag) }
+                        }
                     }
-                }
-                if vm.isEditing {
                     Button { showAddTag = true } label: {
                         Label("Tag", systemImage: "plus").font(.caption)
                     }
@@ -173,6 +176,11 @@ struct NoteDetailView: View {
                     .controlSize(.mini)
                 }
             }
+        } else if let tags = vm.note.tags, !tags.isEmpty {
+            Text(tags.map { "#\($0)" }.joined(separator: "  "))
+                .font(.caption)
+                .foregroundStyle(.tertiary)
+                .lineLimit(2)
         }
     }
 
@@ -198,6 +206,24 @@ struct NoteDetailView: View {
                                         .onTapGesture {
                                             if !vm.isEditing { lightboxImage = img }
                                         }
+                                } else if let reason = vm.imageErrors[ni.id] {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(.quaternary)
+                                        .frame(width: 140, height: 180)
+                                        .overlay(
+                                            VStack(spacing: 6) {
+                                                Image(systemName: "exclamationmark.triangle")
+                                                    .foregroundStyle(.orange)
+                                                Text(reason)
+                                                    .font(.caption2)
+                                                    .multilineTextAlignment(.center)
+                                                    .foregroundStyle(.secondary)
+                                                Button("Retry") { Task { await vm.retryImage(ni) } }
+                                                    .font(.caption2)
+                                                    .buttonStyle(.bordered)
+                                            }
+                                            .padding(6)
+                                        )
                                 } else {
                                     RoundedRectangle(cornerRadius: 10)
                                         .fill(.quaternary)

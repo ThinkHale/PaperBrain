@@ -83,7 +83,7 @@ struct NoteListView: View {
         Menu {
             ShareLink(
                 item: notesExportData,
-                preview: SharePreview("Illuminote Export", image: Image(systemName: "square.and.arrow.up"))
+                preview: SharePreview("Illuminotes Export", image: Image(systemName: "square.and.arrow.up"))
             ) {
                 Label("Export All (JSON)", systemImage: "arrow.down.doc")
             }
@@ -102,9 +102,7 @@ struct NoteListView: View {
 struct NoteRowView: View {
     let note: Note
 
-    private var hasChips: Bool {
-        !(note.categories ?? []).isEmpty || !(note.tags ?? []).isEmpty
-    }
+    private var categories: [String] { note.categories ?? [] }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -133,14 +131,13 @@ struct NoteRowView: View {
                     .lineLimit(2)
             }
 
-            if hasChips {
+            // Categories are the primary identifier shown in the list; topic tags
+            // stay searchable but aren't shown here to keep the list uncluttered.
+            if !categories.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
-                        ForEach(note.categories ?? [], id: \.self) { cat in
+                        ForEach(categories, id: \.self) { cat in
                             CategoryChip(name: cat)
-                        }
-                        ForEach(note.tags ?? [], id: \.self) { tag in
-                            TagChip(tag: tag)
                         }
                     }
                 }
